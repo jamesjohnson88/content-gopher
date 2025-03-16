@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/generative-ai-go/genai"
+	"github.com/jamesjohnson88/content-gopher/application/content_types/multiple_choice_question"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"log"
@@ -36,6 +37,8 @@ func main() {
 	}
 	defer geminiClient.Close()
 
+	genModel := geminiClient.GenerativeModel(config.GeminiModel)
+
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Content Gopher x AI Slop")
 	fmt.Println("--------------------------")
@@ -50,8 +53,8 @@ func main() {
 		}
 
 		switch in := strings.TrimSpace(strings.ToLower(input)); in {
-		case "mpd":
-			HandleMillionPoundDrop(geminiClient, &config)
+		case "multi":
+			multiple_choice_question.Handle(genModel)
 			continue
 		case "q", "quit":
 			fmt.Println("Exiting...")
@@ -64,6 +67,6 @@ func main() {
 
 func displayInputChoices() {
 	fmt.Println("\nSelect content type:")
-	fmt.Println("* Enter 'mpd' for to create Million Pound Drop content")
+	fmt.Println("* Enter 'multi' to create multiple choice question content")
 	fmt.Println("* Enter 'q' or 'quit' to exit\n")
 }

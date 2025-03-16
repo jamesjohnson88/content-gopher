@@ -1,4 +1,4 @@
-package million_pound_drop
+package multiple_choice_question
 
 type Category string
 type Difficulty string
