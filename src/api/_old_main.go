@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/generative-ai-go/genai"
-	"github.com/jamesjohnson88/content-gopher/application/content_types/multiple_choice_question"
+	"github.com/jamesjohnson88/content-gopher/api/content_types/multiple_choice_question"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"log"

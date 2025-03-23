@@ -13,7 +13,7 @@ func Handle(gemini *genai.GenerativeModel) {
 	gemini.SetTopK(64)
 	gemini.SetTopP(0.95)
 	gemini.SetMaxOutputTokens(8192)
-	gemini.ResponseMIMEType = "application/json"
+	gemini.ResponseMIMEType = "api/json"
 	fmt.Println("handle multiple_choice question")
 
 	// old code from PoC - here atm for reference
