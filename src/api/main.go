@@ -49,8 +49,6 @@ func run() error {
 		)
 	}
 
-	// todo - may want a cache depending on IO performance
-
 	config := Config{
 		Host:         os.Getenv("HOST"),
 		Port:         os.Getenv("PORT"),
@@ -58,13 +56,6 @@ func run() error {
 		GeminiModel:  os.Getenv("GEMINI_MODEL"),
 	}
 
-	// reg in client?
-	//geminiClient, err := genai.NewClient(ctx, option.WithAPIKey(config.GeminiApiKey))
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer geminiClient.Close()
-	//genModel := geminiClient.GenerativeModel(config.GeminiModel)
 	s := NewServer(&config)
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort(config.Host, config.Port),
