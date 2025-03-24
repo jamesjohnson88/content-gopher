@@ -18,7 +18,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		r.Body = io.NopCloser(bytes.NewBuffer(reqBody)) // then add it back
 
 		// log request
-		var rqHeaderAttrs []slog.Attr
+		var rqHeaderAttrs []any
 		for k, v := range r.Header {
 			rqHeaderAttrs = append(rqHeaderAttrs, slog.Any(k, v))
 		}
@@ -27,7 +27,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 			slog.String("method", r.Method),
 			slog.String("url", r.URL.String()),
 			slog.String("ip", r.RemoteAddr),
-			slog.Group("headers", rqHeaderAttrs),
+			slog.Group("headers", rqHeaderAttrs...),
 			slog.String("body", string(reqBody)),
 		)
 
@@ -36,7 +36,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(rs, r)
 
 		// log response
-		var rsHeaderAttrs []slog.Attr
+		var rsHeaderAttrs []any
 		for k, v := range rs.Header() {
 			rsHeaderAttrs = append(rsHeaderAttrs, slog.Any(k, v))
 		}
@@ -44,7 +44,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		slog.Info("outgoing_response",
 			slog.Int("status_code", rs.statusCode),
 			slog.Duration("duration", time.Since(start)),
-			slog.Group("headers", rsHeaderAttrs),
+			slog.Group("headers", rsHeaderAttrs...),
 			slog.String("body", rs.body.String()),
 		)
 	})
