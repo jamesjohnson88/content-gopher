@@ -5,8 +5,8 @@ const Home: Component = () => {
     return (
         <main class="container mx-auto py-8 px-4 flex-grow">
             <div class="max-w-4xl mx-auto">
-                <h1 class="text-3xl font-bold mb-2">Welcome to Quiz Creator</h1>
-                <p class="text-gray-600 mb-8">Create and manage quiz content with AI assistance</p>
+                <h1 class="text-xl font-bold mb-2">Welcome to Content Gopher</h1>
+                <p class="text-gray-600 mb-6">Please select from the following options:</p>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="border rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -27,7 +27,8 @@ const Home: Component = () => {
                                 </svg>
                                 Start New Session
                             </h2>
-                            <p class="text-gray-500 mt-1 mb-4">Generate new quiz questions with AI and curate them</p>
+                            <p class="text-gray-500 mt-1 mb-4">Generate new quiz questions with AI, amend them as you see fit,
+                                and write them to your json file.</p>
                             <A href="/sessions/new">
                             <button class="w-full bg-black hover:bg-gray-700 text-white py-2 px-4 rounded">Create Session</button>
                             </A>
@@ -53,7 +54,7 @@ const Home: Component = () => {
                                 </svg>
                                 Browse Existing Content
                             </h2>
-                            <p class="text-gray-500 mt-1 mb-4">View and manage your existing quiz questions</p>
+                            <p class="text-gray-500 mt-1 mb-4">View, manage and build upon your existing content from previous sessions.</p>
                             <A href="/sessions/browse">
                                 <button class="w-full border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 py-2 px-4 rounded">
                                     Browse Content
