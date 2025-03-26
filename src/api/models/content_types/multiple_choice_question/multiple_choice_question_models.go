@@ -4,6 +4,7 @@ type Category string
 type Difficulty string
 
 const (
+	CategoryMixed               = "Mixed"
 	CategoryGeneralKnowledge    = "General Knowledge"
 	CategoryScienceNature       = "Science & Nature"
 	CategoryHistoryPolitics     = "History & Politics"
@@ -17,6 +18,7 @@ const (
 	CategorySpaceAstronomy      = "Space & Astronomy"
 	CategoryArtDesign           = "Art & Design"
 
+	// CategoriesList excludes 'mixed' as it already encompasses the finer grain categories
 	CategoriesList = "General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, " +
 		"Sports & Games, Computer Science & Technology, Mathematics & Logic, Food & Drink, " +
 		"Mythology & Religion, Space & Astronomy, Art & Design"
@@ -27,7 +29,7 @@ const (
 	DifficultyHard     Difficulty = "hard"
 )
 
-type MillionPoundDropQuestion struct {
+type MultipleChoiceQuestion struct {
 	Id              string         `json:"id"`
 	Category        Category       `json:"category"`
 	Difficulty      Difficulty     `json:"difficulty"`

@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"github.com/google/generative-ai-go/genai"
-	"github.com/jamesjohnson88/content-gopher/middleware"
+	"github.com/jamesjohnson88/content-gopher/handlers/sessions"
+	"github.com/jamesjohnson88/content-gopher/internal/middleware"
 	"google.golang.org/api/option"
 	"log"
 	"net/http"
@@ -33,8 +34,10 @@ func addRoutes(mux *http.ServeMux, cfg *Config, client *genai.Client) {
 	// or choose to start a new one
 	mux.Handle("GET /api/sessions", http.NotFoundHandler())
 
+	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
+
 	// begin new sessions - specify type, params, etc.
-	mux.Handle("POST /api/sessions", http.NotFoundHandler())
+	mux.Handle("POST /api/sessions", sessions.NewSessionHandler())
 	// update session
 	mux.Handle("PUT /api/sessions", http.NotFoundHandler())
 
