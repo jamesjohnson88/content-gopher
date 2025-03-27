@@ -7,8 +7,8 @@ type FormatDataProvider interface {
 }
 
 type SessionOption struct {
-	Title   string                   `json:"title,required"`
-	Options []SessionOptionSelection `json:"options,required"`
+	Title   string      `json:"title,required"`
+	Options interface{} `json:"options,required"`
 }
 
 type SessionOptionSelection struct {

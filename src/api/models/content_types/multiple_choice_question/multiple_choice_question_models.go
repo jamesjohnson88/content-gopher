@@ -4,22 +4,23 @@ type Category string
 type Difficulty string
 
 const (
-	CategoryMixed               Category = "Mixed"
-	CategoryGeneralKnowledge    Category = "General Knowledge"
-	CategoryScienceNature       Category = "Science & Nature"
-	CategoryHistoryPolitics     Category = "History & Politics"
-	CategoryGeography           Category = "Geography"
-	CategoryEntertainment       Category = "Entertainment & Pop Culture"
-	CategorySportsGames         Category = "Sports & Games"
-	CategoryComputerScienceTech Category = "Computer Science & Technology"
-	CategoryMathematicsLogic    Category = "Mathematics & Logic"
-	CategoryFoodDrink           Category = "Food & Drink"
-	CategoryMythologyReligion   Category = "Mythology & Religion"
-	CategorySpaceAstronomy      Category = "Space & Astronomy"
-	CategoryArtDesign           Category = "Art & Design"
+	CategoryMixed               Category = "mixed"
+	CategoryArtDesign           Category = "art_design"
+	CategoryComputerScienceTech Category = "computer_science_tech"
+	CategoryEntertainment       Category = "entertainment"
+	CategoryFoodDrink           Category = "food_drink"
+	CategoryGeneralKnowledge    Category = "general_knowledge"
+	CategoryGeography           Category = "geography"
+	CategoryHistoryPolitics     Category = "history_politics"
+	CategoryMathematicsLogic    Category = "mathematics_logic"
+	CategoryMythologyReligion   Category = "mythology_religion"
+	CategoryScienceNature       Category = "science_nature"
+	CategorySpaceAstronomy      Category = "space_astronomy"
+	CategorySportsGames         Category = "sports_games"
 
 	// CategoriesList excludes 'mixed' as it already encompasses the finer grain categories
-	CategoriesList = "General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, " +
+	CategoriesList = "" +
+		"General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, " +
 		"Sports & Games, Computer Science & Technology, Mathematics & Logic, Food & Drink, " +
 		"Mythology & Religion, Space & Astronomy, Art & Design"
 

@@ -9,7 +9,7 @@ import (
 
 func GetSessionConfigOptions() interface{} {
 	return struct {
-		FormatType string          `json:"formatType"`
+		FormatType string          `json:"formatType"` // todo - move this into model above - then this return type can also be strongly typed
 		Difficulty s.SessionOption `json:"difficulty"`
 		Category   s.SessionOption `json:"category"`
 	}{
@@ -23,30 +23,24 @@ func GetSessionConfigOptions() interface{} {
 				*s.NewSessionOptionSelection("Hard", string(DifficultyHard)),
 			},
 		},
-		//DifficultyOptions: map[string]s.SessionOptionSelection{
-		//	"Difficulty": {
-		//		s.NewSessionOptionSelection("Easy", string(DifficultyVeryEasy)),
-		//		//string(DifficultyVeryEasy),
-		//		//string(DifficultyEasy):   "Easy",
-		//		//string(DifficultyMedium): "Medium",
-		//		//string(DifficultyHard):   "Hard"},
-		//	},
-		//},
-		//CategoryOptions: map[string]s.SessionOptionSelection{
-		//	string(CategoryMixed):               "Mixed",
-		//	string(CategoryGeneralKnowledge):    "General Knowledge",
-		//	string(CategoryScienceNature):       "Science & Nature",
-		//	string(CategoryHistoryPolitics):     "History & Politics",
-		//	string(CategoryGeography):           "Geography",
-		//	string(CategoryEntertainment):       "Entertainment & Pop Culture",
-		//	string(CategorySportsGames):         "Sports & Games",
-		//	string(CategoryComputerScienceTech): "Computer Science & Technology",
-		//	string(CategoryMathematicsLogic):    "Mathematics & Logic",
-		//	string(CategoryFoodDrink):           "Food & Drink",
-		//	string(CategoryMythologyReligion):   "Mythology & Religion",
-		//	string(CategorySpaceAstronomy):      "Space & Astronomy",
-		//	string(CategoryArtDesign):           "Art & Design",
-		//},
+		Category: s.SessionOption{
+			Title: "Category",
+			Options: []s.SessionOptionSelection{
+				*s.NewSessionOptionSelection("Mixed", string(CategoryMixed)),
+				*s.NewSessionOptionSelection("Art & Design", string(CategoryArtDesign)),
+				*s.NewSessionOptionSelection("Computer Science & Technology", string(CategoryComputerScienceTech)),
+				*s.NewSessionOptionSelection("Entertainment & Pop Culture", string(CategoryEntertainment)),
+				*s.NewSessionOptionSelection("Food & Drink", string(CategoryFoodDrink)),
+				*s.NewSessionOptionSelection("General Knowledge", string(CategoryGeneralKnowledge)),
+				*s.NewSessionOptionSelection("Geography", string(CategoryGeography)),
+				*s.NewSessionOptionSelection("History & Politics", string(CategoryHistoryPolitics)),
+				*s.NewSessionOptionSelection("Mathematics & Logic", string(CategoryMathematicsLogic)),
+				*s.NewSessionOptionSelection("Mythology & Religion", string(CategoryMythologyReligion)),
+				*s.NewSessionOptionSelection("Science & Nature", string(CategoryScienceNature)),
+				*s.NewSessionOptionSelection("Space & Astronomy", string(CategorySpaceAstronomy)),
+				*s.NewSessionOptionSelection("Sports & Games", string(CategorySportsGames)),
+			},
+		},
 	}
 }
 

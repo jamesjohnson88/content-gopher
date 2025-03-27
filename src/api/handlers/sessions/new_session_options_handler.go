@@ -2,12 +2,13 @@ package sessions
 
 import (
 	"encoding/json"
+	. "github.com/jamesjohnson88/content-gopher/models/sessions"
 	"github.com/jamesjohnson88/content-gopher/services/content_types/multiple_choice_question"
 	"net/http"
 )
 
 type sessionOptions struct {
-	SessionTypes map[string]interface{}
+	SessionTypes []*SessionOption `json:"session_types"`
 }
 
 func NewSessionOptionsHandler() http.HandlerFunc {
@@ -15,8 +16,11 @@ func NewSessionOptionsHandler() http.HandlerFunc {
 		mcqOptions := multiple_choice_question.GetSessionConfigOptions()
 
 		options := sessionOptions{
-			SessionTypes: map[string]interface{}{
-				"Multiple Choice Questions": mcqOptions,
+			SessionTypes: []*SessionOption{
+				{
+					Title:   "Multiple Choice Questions",
+					Options: mcqOptions,
+				},
 			},
 		}
 
