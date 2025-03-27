@@ -6,9 +6,26 @@ type FormatDataProvider interface {
 	MetaData() map[string]string
 }
 
+type SessionOption struct {
+	Title   string                   `json:"title,required"`
+	Options []SessionOptionSelection `json:"options,required"`
+}
+
+type SessionOptionSelection struct {
+	DisplayName string `json:"displayName,required"`
+	Value       string `json:"value,required"`
+}
+
+func NewSessionOptionSelection(displayName, value string) *SessionOptionSelection {
+	return &SessionOptionSelection{
+		DisplayName: displayName,
+		Value:       value,
+	}
+}
+
 type Session struct {
-	SessionFileName string            `json:"sessionFileName"`
-	ContentFormat   string            `json:"contentFormat"`
+	SessionFileName string            `json:"sessionFileName,required"`
+	ContentFormat   string            `json:"contentFormat,required"`
 	Metadata        map[string]string `json:"metadata"`
 }
 

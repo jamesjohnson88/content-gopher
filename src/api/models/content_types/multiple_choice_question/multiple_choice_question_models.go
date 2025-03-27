@@ -4,19 +4,19 @@ type Category string
 type Difficulty string
 
 const (
-	CategoryMixed               = "Mixed"
-	CategoryGeneralKnowledge    = "General Knowledge"
-	CategoryScienceNature       = "Science & Nature"
-	CategoryHistoryPolitics     = "History & Politics"
-	CategoryGeography           = "Geography"
-	CategoryEntertainment       = "Entertainment & Pop Culture"
-	CategorySportsGames         = "Sports & Games"
-	CategoryComputerScienceTech = "Computer Science & Technology"
-	CategoryMathematicsLogic    = "Mathematics & Logic"
-	CategoryFoodDrink           = "Food & Drink"
-	CategoryMythologyReligion   = "Mythology & Religion"
-	CategorySpaceAstronomy      = "Space & Astronomy"
-	CategoryArtDesign           = "Art & Design"
+	CategoryMixed               Category = "Mixed"
+	CategoryGeneralKnowledge    Category = "General Knowledge"
+	CategoryScienceNature       Category = "Science & Nature"
+	CategoryHistoryPolitics     Category = "History & Politics"
+	CategoryGeography           Category = "Geography"
+	CategoryEntertainment       Category = "Entertainment & Pop Culture"
+	CategorySportsGames         Category = "Sports & Games"
+	CategoryComputerScienceTech Category = "Computer Science & Technology"
+	CategoryMathematicsLogic    Category = "Mathematics & Logic"
+	CategoryFoodDrink           Category = "Food & Drink"
+	CategoryMythologyReligion   Category = "Mythology & Religion"
+	CategorySpaceAstronomy      Category = "Space & Astronomy"
+	CategoryArtDesign           Category = "Art & Design"
 
 	// CategoriesList excludes 'mixed' as it already encompasses the finer grain categories
 	CategoriesList = "General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, " +
