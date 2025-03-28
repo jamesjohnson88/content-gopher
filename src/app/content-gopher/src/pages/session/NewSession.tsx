@@ -1,28 +1,54 @@
 ﻿"use client"
 
-import { createSignal } from "solid-js"
+import { createSignal, createResource } from "solid-js"
 import type { Component } from 'solid-js';
+
+interface OptionItem {
+    displayName: string;
+    value: string;
+}
+
+interface OptionGroup {
+    title: string;
+    content_format: string;
+    options: OptionItem[];
+}
+
+interface SessionType {
+    title: string;
+    content_format: string;
+    options: OptionGroup[];
+}
+
+interface SessionOptions {
+    session_types: SessionType[];
+}
+
 
 const [sessionName, setSessionName] = createSignal("")
 const [category, setCategory] = createSignal("")
 const [difficulty, setDifficulty] = createSignal("")
 const [format, setFormat] = createSignal("")
 
-// todo - options per content type, or one big map from api?
+async function fetchData(): Promise<SessionOptions> {
+    // todo - construct url from config
+    const response = await fetch("http://localhost:7272/api/sessions/options");
+    if (!response.ok) throw new Error("Could not fetch data");
+    return response.json();
+}
+
+const [sessionData] = createResource(fetchData);
 
 const handleContentFormatChange = (value:string) => {
-    setCategory(value)
-    // get options from api
+    setFormat(value)
 }
 
 const handleDifficultyChange = (value:string) => {
     setDifficulty(value)
-    // get options from api
 }
 
 const handleCategoryChange = (value:string) => {
     setCategory(value)
-    // get options from api
 }
 
 const handleCreateSession = () => {
@@ -38,6 +64,9 @@ const NewSession: Component = () => {
     return (
         <main class="container mx-auto py-8 px-4 flex-grow">
             <div class="max-w-2xl mx-auto">
+                {sessionData.loading && <p>Loading...</p>}
+                {sessionData.error && <p>Error: {sessionData.error.message}</p>}
+                {sessionData() && console.log(sessionData())}
                 <h1 class="text-3xl font-bold mb-6">Create New Session</h1>
                 <div class="border rounded-lg shadow-sm">
                     <div class="p-6">
@@ -70,10 +99,11 @@ const NewSession: Component = () => {
                                     <option value="select-format" disabled>
                                         Select format
                                     </option>
-                                    <option value="multiple-choice">Multiple Choice</option>
-                                    <option value="true-false">True/False</option>
-                                    <option value="short-answer">Short Answer</option>
-                                    <option value="mixed">Mixed</option>
+                                    {sessionData()?.session_types.map((st) => {
+                                        return (
+                                            <option value={st.content_format}>{st.title}</option>
+                                        )
+                                    })}
                                 </select>
                             </div>
                             <div class="space-y-2">
