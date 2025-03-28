@@ -7,14 +7,9 @@ import (
 	s "github.com/jamesjohnson88/content-gopher/models/sessions"
 )
 
-func GetSessionConfigOptions() interface{} {
-	return struct {
-		FormatType string          `json:"formatType"` // todo - move this into model above - then this return type can also be strongly typed
-		Difficulty s.SessionOption `json:"difficulty"`
-		Category   s.SessionOption `json:"category"`
-	}{
-		FormatType: "multiple_choice_question",
-		Difficulty: s.SessionOption{
+func GetSessionConfigOptions() []s.SessionOption {
+	return []s.SessionOption{
+		{
 			Title: "Difficulty",
 			Options: []s.SessionOptionSelection{
 				*s.NewSessionOptionSelection("Very Easy", string(DifficultyVeryEasy)),
@@ -23,7 +18,7 @@ func GetSessionConfigOptions() interface{} {
 				*s.NewSessionOptionSelection("Hard", string(DifficultyHard)),
 			},
 		},
-		Category: s.SessionOption{
+		{
 			Title: "Category",
 			Options: []s.SessionOptionSelection{
 				*s.NewSessionOptionSelection("Mixed", string(CategoryMixed)),

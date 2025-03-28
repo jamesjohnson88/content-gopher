@@ -4,6 +4,9 @@ type Category string
 type Difficulty string
 
 const (
+	Title      string = "Multiple Choice Question"
+	FormatType string = "multiple_choice_question"
+
 	CategoryMixed               Category = "mixed"
 	CategoryArtDesign           Category = "art_design"
 	CategoryComputerScienceTech Category = "computer_science_tech"
