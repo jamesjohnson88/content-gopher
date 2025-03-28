@@ -25,6 +25,7 @@ func NewServer(cfg *Config) http.Handler {
 		geminiClient)
 
 	handler := middleware.LoggingMiddleware(mux)
+	handler = middleware.CorsMiddleware(handler)
 
 	return handler
 }
