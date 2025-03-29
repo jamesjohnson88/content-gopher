@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import {createSignal, createResource, createMemo, catchError} from "solid-js"
+import {createSignal, createResource, createMemo, createEffect } from "solid-js"
 import { useNavigate } from "@solidjs/router";
 
 
@@ -33,72 +33,80 @@ type NewSessionForm = {
     metadata: Record<string, string>;
 }
 
-
-const [sessionName, setSessionName] = createSignal("")
-const [format, setFormat] = createSignal("")
-const [formData, setFormData] = createSignal<Record<string,string>>({})
-const [formErrs, setFormErrs] = createSignal<Record<string,string>>({})
-
-const [sessionData] = createResource(fetchData);
-//const navigate = useNavigate();
-
-async function fetchData(): Promise<SessionOptions> {
-    // todo - construct url from config
-    const response = await fetch("http://localhost:7272/api/sessions/options");
-    if (!response.ok) throw new Error("Could not fetch data");
-    return response.json();
-}
-
-function addFormField(fieldName:string) {
-    setFormData((prevState) => ({...prevState, [fieldName]: "" }));
-    setFormErrs((prevState) => ({...prevState, [fieldName]: "" }));
-}
-
-const handleContentFormatChange = (value:string) => {
-    setFormat(value)
-}
-
-function handleInputChange(fieldName: string, value: string) {
-    setFormData((prev) => ({ ...prev, [fieldName]: value }));
-    if (!value.trim()) {
-        setFormErrs((prev) => ({ ...prev, [fieldName]: "This field is required" }));
-    } else {
-        setFormErrs((prev) => ({ ...prev, [fieldName]: "" }));
-    }
-}
-
-const isFormValid = createMemo(() => {
-    return sessionName() && format()
-        && Object.values(formErrs()).every((error) => error === "")
-        && Object.values(formData()).every((value) => value.trim() !== "");
-});
-
-async function handleCreateSession() {
-    const form: NewSessionForm = {
-        sessionName: sessionName(),
-        contentFormat: format(),
-        metadata: formData()
-    }
-
-    try {
-        const response = await fetch("http://localhost:7272/api/sessions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(form)
-        });
-
-        if (!response.ok) throw new Error("Could not create session");
-
-        console.log(response);
-        // navigate(response.Url)
-    } catch (error) {
-        console.log(error);
-    }
-}
-
 const NewSession: Component = () => {
+    const [sessionName, setSessionName] = createSignal("")
+    const [format, setFormat] = createSignal("")
+    const [formData, setFormData] = createSignal<Record<string,string>>({})
+    const [formErrs, setFormErrs] = createSignal<Record<string,string>>({})
+    const [loading, setLoading] = createSignal<boolean>(false)
+
+    const [sessionData] = createResource(fetchData);
+    const navigate = useNavigate();
+
+    async function fetchData(): Promise<SessionOptions> {
+        // todo - construct url from config
+        const response = await fetch("http://localhost:7272/api/sessions/options");
+        if (!response.ok) throw new Error("Could not fetch data");
+        return response.json();
+    }
+
+    function addFormField(fieldName:string) {
+        setFormData((prevState) => ({...prevState, [fieldName]: "" }));
+        setFormErrs((prevState) => ({...prevState, [fieldName]: "" }));
+    }
+
+    const handleContentFormatChange = (value:string) => {
+        setFormat(value)
+    }
+
+    function handleInputChange(fieldName: string, value: string) {
+        setFormData((prev) => ({ ...prev, [fieldName]: value }));
+        if (!value.trim()) {
+            setFormErrs((prev) => ({ ...prev, [fieldName]: "This field is required" }));
+        } else {
+            setFormErrs((prev) => ({ ...prev, [fieldName]: "" }));
+        }
+    }
+
+    createEffect(() => {
+        const data = sessionData();
+        if (data && data.session_types.length === 1) {
+            setFormat(data.session_types[0].content_format);
+        }
+    });
+
+    const isFormValid = createMemo(() => {
+        return sessionName() && format() && !loading()
+            && Object.values(formErrs()).every((error) => error === "")
+            && Object.values(formData()).every((value) => value.trim() !== "");
+    });
+
+    async function handleCreateSession() {
+        const form: NewSessionForm = {
+            sessionName: sessionName(),
+            contentFormat: format(),
+            metadata: formData()
+        }
+
+        try {
+            const response = await fetch("http://localhost:7272/api/sessions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(form)
+            });
+
+            if (!response.ok) throw new Error("Could not create session");
+
+            console.log(response);
+            navigate("/content/multiple-choice-question", { replace: true }); //url.responseUrl // todo
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <main class="container mx-auto py-8 px-4 flex-grow">
@@ -182,7 +190,7 @@ const NewSession: Component = () => {
                             onClick={handleCreateSession}
                             disabled={!isFormValid()}
                         >
-                            Start Session
+                            {loading() ? "Submitting..." : "Start Session"}
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="h-4 w-4"

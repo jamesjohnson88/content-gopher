@@ -29,11 +29,3 @@ type Session struct {
 	ContentFormat string            `json:"contentFormat,required"`
 	Metadata      map[string]string `json:"metadata"`
 }
-
-func NewSession(cfg FormatDataProvider) *Session {
-	return &Session{
-		SessionName:   cfg.Filename(),
-		ContentFormat: cfg.ContentFormat(),
-		Metadata:      cfg.MetaData(),
-	}
-}

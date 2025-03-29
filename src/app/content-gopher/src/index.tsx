@@ -9,6 +9,7 @@ import NewSession from "./pages/session/NewSession";
 import BrowseSessions from "./pages/session/BrowseSessions";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
+import MultipleChoiceQuestions from "./pages/content/MultipleChoiceQuestions";
 
 
 const App: ParentComponent = (props) => {
@@ -27,6 +28,9 @@ render(() =>
             <Route path="/sessions">
                 <Route path="/new" component={NewSession} />
                 <Route path="/browse" component={BrowseSessions} />
+            </Route>
+            <Route path="/content">
+                <Route path="/multiple-choice-question" component={MultipleChoiceQuestions} />
             </Route>
             <Route path="*paramName" component={NotFound} />
         </Router>

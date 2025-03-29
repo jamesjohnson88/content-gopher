@@ -2,12 +2,15 @@ package sessions
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/jamesjohnson88/content-gopher/internal/config"
+	"github.com/jamesjohnson88/content-gopher/internal/files"
 	"github.com/jamesjohnson88/content-gopher/models/sessions"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func NewSessionHandler(cfg *config.Config) http.HandlerFunc {
@@ -37,16 +40,59 @@ func NewSessionHandler(cfg *config.Config) http.HandlerFunc {
 			}
 		}
 
-		// todo - need a filename normalizing function
-		err = os.WriteFile(outDir+"/test.json", []byte("{ 'test': true }"), 0644)
+		filePath, err := createFilename(newSession.SessionName, outDir)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-		spew.Dump(os.DirFS(outDir))
+		err = os.WriteFile(filePath, []byte("{ 'test': true }"), 0644)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		rsBody := struct {
+			ResponseUrl string `json:"responseUrl"`
+		}{
+			ResponseUrl: fmt.Sprintf("/content/%s", strings.ReplaceAll(newSession.ContentFormat, "_", "-")),
+		}
+
+		err = json.NewEncoder(w).Encode(rsBody)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		return
 	}
 }
 
-// also todo - prevent file overwrites...
+func createFilename(filename, dir string) (string, error) {
+	filename, err := files.SanitizeFileName(filename)
+	if err != nil {
+		return "", err
+	}
 
-// todo
-func filename(input string) string {
-	return ""
+	return uniqueFilename(fmt.Sprintf("%s/%s.json", dir, filename)), nil
+}
+
+func uniqueFilename(base string) string {
+	count := 1
+	ext := ""
+	name := base
+
+	if dot := strings.LastIndex(base, "."); dot != -1 {
+		name = base[:dot]
+		ext = base[dot:]
+	}
+
+	for {
+		if _, err := os.Stat(base); os.IsNotExist(err) {
+			return base
+		}
+		base = fmt.Sprintf("%s_%d%s", name, count, ext)
+		count++
+	}
 }

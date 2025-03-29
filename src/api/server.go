@@ -43,8 +43,6 @@ func addRoutes(mux *http.ServeMux, cfg *config.Config, client *genai.Client) {
 	// provide the available options for creating sessions
 	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
 
-	// request content from AI model
-	mux.Handle("GET /api/multi-choice", http.NotFoundHandler())
-	// update a single multi choice question
-	mux.Handle("PATCH /api/multi-choice", http.NotFoundHandler())
+	// multiple choice question session
+	mux.Handle("GET /api/content/multiple-choice-question", http.NotFoundHandler())
 }
