@@ -10,7 +10,8 @@ import (
 func GetSessionConfigOptions() []s.SessionOption {
 	return []s.SessionOption{
 		{
-			Title: "Difficulty",
+			Title:         "Difficulty",
+			ContentFormat: "difficulty",
 			Options: []s.SessionOptionSelection{
 				*s.NewSessionOptionSelection("Very Easy", string(DifficultyVeryEasy)),
 				*s.NewSessionOptionSelection("Easy", string(DifficultyEasy)),
@@ -19,7 +20,8 @@ func GetSessionConfigOptions() []s.SessionOption {
 			},
 		},
 		{
-			Title: "Category",
+			Title:         "Category",
+			ContentFormat: "category",
 			Options: []s.SessionOptionSelection{
 				*s.NewSessionOptionSelection("Mixed", string(CategoryMixed)),
 				*s.NewSessionOptionSelection("Art & Design", string(CategoryArtDesign)),

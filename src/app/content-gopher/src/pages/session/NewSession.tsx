@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { createSignal, createResource } from "solid-js"
+import {createSignal, createResource, createMemo} from "solid-js"
 import type { Component } from 'solid-js';
 
 interface OptionItem {
@@ -26,9 +26,11 @@ interface SessionOptions {
 
 
 const [sessionName, setSessionName] = createSignal("")
-const [category, setCategory] = createSignal("")
-const [difficulty, setDifficulty] = createSignal("")
 const [format, setFormat] = createSignal("")
+const [formData, setFormData] = createSignal<{ [key:string]: string }>({})
+const [formErrs, setFormErrs] = createSignal<{ [key:string]: string }>({})
+
+const [sessionData] = createResource(fetchData);
 
 async function fetchData(): Promise<SessionOptions> {
     // todo - construct url from config
@@ -37,26 +39,36 @@ async function fetchData(): Promise<SessionOptions> {
     return response.json();
 }
 
-const [sessionData] = createResource(fetchData);
+function addFormField(fieldName:string) {
+    setFormData((prevState) => ({...prevState, [fieldName]: "" }));
+    setFormErrs((prevState) => ({...prevState, [fieldName]: "" }));
+}
 
 const handleContentFormatChange = (value:string) => {
     setFormat(value)
 }
 
-const handleDifficultyChange = (value:string) => {
-    setDifficulty(value)
+function handleInputChange(fieldName: string, value: string) {
+    setFormData((prev) => ({ ...prev, [fieldName]: value }));
+    if (!value.trim()) {
+        setFormErrs((prev) => ({ ...prev, [fieldName]: "This field is required" }));
+    } else {
+        setFormErrs((prev) => ({ ...prev, [fieldName]: "" }));
+    }
 }
 
-const handleCategoryChange = (value:string) => {
-    setCategory(value)
-}
+
+const isFormValid = createMemo(() => {
+    return sessionName() && format()
+        && Object.values(formErrs()).every((error) => error === "")
+        && Object.values(formData()).every((value) => value.trim() !== "");
+});
 
 const handleCreateSession = () => {
+    console.log(sessionName())
+    console.log(format())
+    console.log(formData())
     alert("todo - post to api")
-}
-
-const isFormValid = () => {
-    return sessionName() && category() && difficulty() && format()
 }
 
 const NewSession: Component = () => {
@@ -97,7 +109,7 @@ const NewSession: Component = () => {
                                     onChange={(e) => handleContentFormatChange(e.target.value)}
                                 >
                                     <option value="select-format" disabled>
-                                        Select format
+                                        Select Format
                                     </option>
                                     {sessionData()?.session_types.map((st) => {
                                         return (
@@ -106,46 +118,36 @@ const NewSession: Component = () => {
                                     })}
                                 </select>
                             </div>
-                            <div class="space-y-2">
-                                <label html-for="difficulty" class="block text-sm font-medium text-gray-700">
-                                    Difficulty
-                                </label>
-                                <select
-                                    id="difficulty"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                    value={difficulty()}
-                                    onChange={(e) => handleDifficultyChange(e.target.value)}
-                                >
-                                    <option value="select-difficulty" disabled>
-                                        Select difficulty
-                                    </option>
-                                    <option value="easy">Easy</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="hard">Hard</option>
-                                    <option value="mixed">Mixed</option>
-                                </select>
-                            </div>
-                            <div class="space-y-2">
-                                <label html-for="category" class="block text-sm font-medium text-gray-700">
-                                    Category
-                                </label>
-                                <select
-                                    id="category"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                    value={category()}
-                                    onChange={(e) => handleCategoryChange(e.target.value)}
-                                >
-                                    <option value="select-category" disabled>
-                                        Select a category
-                                    </option>
-                                    <option value="general">General Knowledge</option>
-                                    <option value="science">Science</option>
-                                    <option value="history">History</option>
-                                    <option value="geography">Geography</option>
-                                    <option value="entertainment">Entertainment</option>
-                                    <option value="sports">Sports</option>
-                                </select>
-                            </div>
+                            {sessionData()?.session_types.filter((s) => s.content_format == format()).map((st) => {
+                                return (
+                                    st.options.map((opt) => {
+                                        addFormField(opt.content_format);
+                                        return <div class="space-y-2">
+                                            <label html-for={opt.content_format}
+                                                   class="block text-sm font-medium text-gray-700">
+                                                {opt.title}
+                                            </label>
+                                            <select
+                                                id={opt.content_format}
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                onChange={(e) => handleInputChange(opt.content_format, e.target.value)}
+                                                value=""
+                                            >
+                                                <option value="select-value" disabled>
+                                                    Select {opt.title}
+                                                </option>
+                                                {opt.options.map((o) => {
+                                                    return (
+                                                        <option value={o.value}>
+                                                            {o.displayName}
+                                                        </option>
+                                                    )
+                                                })}
+                                            </select>
+                                        </div>
+                                    })
+                                )
+                            })}
                         </div>
                     </div>
                     <div class="px-6 py-4 pt-2 bg-gray-50 rounded-b-lg">
