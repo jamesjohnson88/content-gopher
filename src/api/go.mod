@@ -3,6 +3,7 @@ module github.com/jamesjohnson88/content-gopher
 go 1.24.1
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/google/generative-ai-go v0.19.0
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.226.0

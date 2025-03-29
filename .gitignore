@@ -8,3 +8,4 @@ riderModule.iml
 go.sum
 *.air.toml
 *tmp*
+/src/api/my-content/*

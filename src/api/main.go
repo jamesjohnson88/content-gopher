@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"github.com/jamesjohnson88/content-gopher/internal/config"
 	"github.com/joho/godotenv"
 	"log/slog"
 	"net"
@@ -16,13 +17,6 @@ import (
 
 //go:embed .version
 var version string
-
-type Config struct {
-	Host         string `env:"HOST,required"`
-	Port         string `env:"PORT,required"`
-	GeminiApiKey string `env:"GEMINI_API_KEY,required"`
-	GeminiModel  string `env:"GEMINI_MODEL,required"`
-}
 
 func main() {
 	println("Content Gopher: version", version)
@@ -49,16 +43,11 @@ func run() error {
 		)
 	}
 
-	config := Config{
-		Host:         os.Getenv("HOST"),
-		Port:         os.Getenv("PORT"),
-		GeminiApiKey: os.Getenv("GEMINI_API_KEY"),
-		GeminiModel:  os.Getenv("GEMINI_MODEL"),
-	}
+	cfg := config.GetConfig()
 
-	s := NewServer(&config)
+	s := NewServer(cfg)
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(config.Host, config.Port),
+		Addr:    net.JoinHostPort(cfg.Host, cfg.Port),
 		Handler: s,
 	}
 
