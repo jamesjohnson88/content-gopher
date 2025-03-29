@@ -25,15 +25,15 @@ func NewSessionOptionSelection(displayName, value string) *SessionOptionSelectio
 }
 
 type Session struct {
-	SessionFileName string            `json:"sessionFileName,required"`
-	ContentFormat   string            `json:"contentFormat,required"`
-	Metadata        map[string]string `json:"metadata"`
+	SessionName   string            `json:"sessionName,required"`
+	ContentFormat string            `json:"contentFormat,required"`
+	Metadata      map[string]string `json:"metadata"`
 }
 
 func NewSession(cfg FormatDataProvider) *Session {
 	return &Session{
-		SessionFileName: cfg.Filename(),
-		ContentFormat:   cfg.ContentFormat(),
-		Metadata:        cfg.MetaData(),
+		SessionName:   cfg.Filename(),
+		ContentFormat: cfg.ContentFormat(),
+		Metadata:      cfg.MetaData(),
 	}
 }

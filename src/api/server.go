@@ -34,13 +34,13 @@ func addRoutes(mux *http.ServeMux, cfg *Config, client *genai.Client) {
 	// check what files are available in the working directory that the user can build upon
 	// or choose to start a new one
 	mux.Handle("GET /api/sessions", http.NotFoundHandler())
-
-	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
-
 	// begin new sessions - specify type, params, etc.
 	mux.Handle("POST /api/sessions", sessions.NewSessionHandler())
 	// update session
 	mux.Handle("PUT /api/sessions", http.NotFoundHandler())
+
+	// provide the available options for creating sessions
+	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
 
 	// request content from AI model
 	mux.Handle("GET /api/multi-choice", http.NotFoundHandler())

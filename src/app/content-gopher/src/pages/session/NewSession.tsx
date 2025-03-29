@@ -1,6 +1,9 @@
 ﻿"use client"
 
-import {createSignal, createResource, createMemo} from "solid-js"
+import {createSignal, createResource, createMemo, catchError} from "solid-js"
+import { useNavigate } from "@solidjs/router";
+
+
 import type { Component } from 'solid-js';
 
 interface OptionItem {
@@ -24,13 +27,20 @@ interface SessionOptions {
     session_types: SessionType[];
 }
 
+type NewSessionForm = {
+    sessionName: string;
+    contentFormat: string;
+    metadata: Record<string, string>;
+}
+
 
 const [sessionName, setSessionName] = createSignal("")
 const [format, setFormat] = createSignal("")
-const [formData, setFormData] = createSignal<{ [key:string]: string }>({})
-const [formErrs, setFormErrs] = createSignal<{ [key:string]: string }>({})
+const [formData, setFormData] = createSignal<Record<string,string>>({})
+const [formErrs, setFormErrs] = createSignal<Record<string,string>>({})
 
 const [sessionData] = createResource(fetchData);
+//const navigate = useNavigate();
 
 async function fetchData(): Promise<SessionOptions> {
     // todo - construct url from config
@@ -57,18 +67,35 @@ function handleInputChange(fieldName: string, value: string) {
     }
 }
 
-
 const isFormValid = createMemo(() => {
     return sessionName() && format()
         && Object.values(formErrs()).every((error) => error === "")
         && Object.values(formData()).every((value) => value.trim() !== "");
 });
 
-const handleCreateSession = () => {
-    console.log(sessionName())
-    console.log(format())
-    console.log(formData())
-    alert("todo - post to api")
+async function handleCreateSession() {
+    const form: NewSessionForm = {
+        sessionName: sessionName(),
+        contentFormat: format(),
+        metadata: formData()
+    }
+
+    try {
+        const response = await fetch("http://localhost:7272/api/sessions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form)
+        });
+
+        if (!response.ok) throw new Error("Could not create session");
+
+        console.log(response);
+        // navigate(response.Url)
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const NewSession: Component = () => {
@@ -78,7 +105,6 @@ const NewSession: Component = () => {
             <div class="max-w-2xl mx-auto">
                 {sessionData.loading && <p>Loading...</p>}
                 {sessionData.error && <p>Error: {sessionData.error.message}</p>}
-                {sessionData() && console.log(sessionData())}
                 <h1 class="text-3xl font-bold mb-6">Create New Session</h1>
                 <div class="border rounded-lg shadow-sm">
                     <div class="p-6">
