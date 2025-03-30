@@ -8,5 +8,4 @@ export interface Question {
     correctAnswer: string
     category: string
     difficulty: string
-    session?: string
 }

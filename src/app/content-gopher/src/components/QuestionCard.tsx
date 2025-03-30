@@ -52,167 +52,75 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                 <div class="mt-4">
                     <Show when={isEditing()}>
                         <div class="space-y-4">
-                            <Show when={question.type === "multiple-choice"}>
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700">Options</label>
-                                    <For each={editedOptions()}>
-                                        {(option, index) => (
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                                                    {String.fromCharCode(65 + index())}
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                    value={option}
-                                                    onInput={(e) => updateOption(index(), e.target.value)}
-                                                />
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Options</label>
+                                <For each={editedOptions()}>
+                                    {(option, index) => (
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                                                {String.fromCharCode(65 + index())}
                                             </div>
-                                        )}
-                                    </For>
-
-                                    <div class="mt-4">
-                                        <label class="block text-sm font-medium text-gray-700">Correct Answer</label>
-                                        <div class="mt-2 space-y-2">
-                                            <For each={editedOptions()}>
-                                                {(option, index) => (
-                                                    <div class="flex items-center space-x-2">
-                                                        <input
-                                                            type="radio"
-                                                            id={`option-${index()}`}
-                                                            name="correct-answer"
-                                                            value={option}
-                                                            checked={editedAnswer() === option}
-                                                            onChange={() => setEditedAnswer(option)}
-                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                                        />
-                                                        <label for={`option-${index()}`} class="text-sm text-gray-700">
-                                                            {option}
-                                                        </label>
-                                                    </div>
-                                                )}
-                                            </For>
+                                            <input
+                                                type="text"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                value={option}
+                                                onInput={(e) => updateOption(index(), e.target.value)}
+                                            />
                                         </div>
-                                    </div>
-                                </div>
-                            </Show>
+                                    )}
+                                </For>
 
-                            <Show when={question.type === "true-false"}>
                                 <div class="mt-4">
                                     <label class="block text-sm font-medium text-gray-700">Correct Answer</label>
                                     <div class="mt-2 space-y-2">
-                                        <div class="flex items-center space-x-2">
-                                            <input
-                                                type="radio"
-                                                id="true"
-                                                name="correct-answer"
-                                                value="True"
-                                                checked={editedAnswer() === "True"}
-                                                onChange={() => setEditedAnswer("True")}
-                                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                            />
-                                            <label for="true" class="text-sm text-gray-700">
-                                                True
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center space-x-2">
-                                            <input
-                                                type="radio"
-                                                id="false"
-                                                name="correct-answer"
-                                                value="False"
-                                                checked={editedAnswer() === "False"}
-                                                onChange={() => setEditedAnswer("False")}
-                                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                            />
-                                            <label for="false" class="text-sm text-gray-700">
-                                                False
-                                            </label>
-                                        </div>
+                                        <For each={editedOptions()}>
+                                            {(option, index) => (
+                                                <div class="flex items-center space-x-2">
+                                                    <input
+                                                        type="radio"
+                                                        id={`option-${index()}`}
+                                                        name="correct-answer"
+                                                        value={option}
+                                                        checked={editedAnswer() === option}
+                                                        onChange={() => setEditedAnswer(option)}
+                                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                    />
+                                                    <label html-for={`option-${index()}`}
+                                                           class="text-sm text-gray-700">
+                                                        {option}
+                                                    </label>
+                                                </div>
+                                            )}
+                                        </For>
                                     </div>
                                 </div>
-                            </Show>
-
-                            <Show when={question.type === "higher-lower"}>
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700">Correct Answer</label>
-                                    <input
-                                        type="text"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                        value={editedAnswer()}
-                                        onInput={(e) => setEditedAnswer(e.target.value)}
-                                    />
-                                </div>
-                            </Show>
+                            </div>
                         </div>
                     </Show>
 
                     <Show when={!isEditing()}>
-                        <Show when={question.type === "multiple-choice"}>
-                            <div class="space-y-2">
-                                <For each={question.options}>
-                                    {(option, index) => (
-                                        <div class="flex items-center gap-2">
-                                            <div
-                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                    option === question.correctAnswer
-                                                        ? "bg-green-100 text-green-700 border border-green-200"
-                                                        : "bg-gray-100 text-gray-700 border border-gray-200"
-                                                }`}
-                                            >
-                                                {String.fromCharCode(65 + index())}
-                                            </div>
-                                            <span>{option}</span>
-                                            <Show when={option === question.correctAnswer}>
-                                                <span class="text-green-600 text-sm ml-2">(Correct)</span>
-                                            </Show>
+                        <div class="space-y-2">
+                            <For each={question.options}>
+                                {(option, index) => (
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                                option === question.correctAnswer
+                                                    ? "bg-green-100 text-green-700 border border-green-200"
+                                                    : "bg-gray-100 text-gray-700 border border-gray-200"
+                                            }`}
+                                        >
+                                            {String.fromCharCode(65 + index())}
                                         </div>
-                                    )}
-                                </For>
-                            </div>
-                        </Show>
-
-                        <Show when={question.type === "true-false"}>
-                            <div class="flex gap-4">
-                                <div class={`flex items-center gap-2 ${question.correctAnswer === "True" ? "text-green-700" : ""}`}>
-                                    <div
-                                        class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                            question.correctAnswer === "True"
-                                                ? "bg-green-100 border border-green-200"
-                                                : "bg-gray-100 border border-gray-200"
-                                        }`}
-                                    >
-                                        T
+                                        <span>{option}</span>
+                                        <Show when={option === question.correctAnswer}>
+                                            <span class="text-green-600 text-sm ml-2">(Correct)</span>
+                                        </Show>
                                     </div>
-                                    <span>True</span>
-                                    <Show when={question.correctAnswer === "True"}>
-                                        <span class="text-green-600 text-sm">(Correct)</span>
-                                    </Show>
-                                </div>
-                                <div class={`flex items-center gap-2 ${question.correctAnswer === "False" ? "text-green-700" : ""}`}>
-                                    <div
-                                        class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                            question.correctAnswer === "False"
-                                                ? "bg-green-100 border border-green-200"
-                                                : "bg-gray-100 border border-gray-200"
-                                        }`}
-                                    >
-                                        F
-                                    </div>
-                                    <span>False</span>
-                                    <Show when={question.correctAnswer === "False"}>
-                                        <span class="text-green-600 text-sm">(Correct)</span>
-                                    </Show>
-                                </div>
-                            </div>
-                        </Show>
-
-                        <Show when={question.type === "higher-lower"}>
-                            <div class="mt-2">
-                                <span class="text-sm font-medium">Answer: </span>
-                                <span class="text-green-600">{question.correctAnswer}</span>
-                            </div>
-                        </Show>
+                                )}
+                            </For>
+                        </div>
                     </Show>
                 </div>
             </div>

@@ -9,9 +9,7 @@ function generateId(): string {
 export function generateMockQuestions(
     category: string,
     difficulty: string,
-    format: string,
     count: number,
-    session?: string,
 ): Question[] {
     const questions: Question[] = []
 
@@ -45,9 +43,6 @@ export function generateMockQuestions(
         ],
     }
 
-    const questionType =
-        format === "mixed" ? ["multiple-choice"][Math.floor(Math.random() * 3)] : format
-
     const questionPool = questionTypes["multiple-choice"]
 
     for (let i = 0; i < count; i++) {
@@ -57,16 +52,11 @@ export function generateMockQuestions(
         const question: Question = {
             id: generateId(),
             text: baseQuestion.text,
-            type: questionType as "multiple-choice" | "true-false" | "higher-lower",
+            type: "multiple-choice",
             correctAnswer: baseQuestion.correctAnswer,
-            category:
-                category === "mixed" ? ["general", "science", "history", "geography"][Math.floor(Math.random() * 4)] : category,
-            difficulty: difficulty === "mixed" ? ["easy", "medium", "hard"][Math.floor(Math.random() * 3)] : difficulty,
-            session,
-        }
-
-        if (questionType === "multiple-choice") {
-            question.options = (baseQuestion as any).options
+            category: category,
+            difficulty: difficulty,
+            options: (baseQuestion as any).options,
         }
 
         questions.push(question)

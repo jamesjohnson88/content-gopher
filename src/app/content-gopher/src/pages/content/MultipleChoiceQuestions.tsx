@@ -6,11 +6,13 @@ import {generateMockQuestions} from "../../lib/mock-data"
 import {Question} from "../../types/question";
 
 const MultipleChoiceQuestions: Component = () => {
+
+    // todo - need to fetch these from session response
     const [searchParams] = useSearchParams()
     const sessionName = () => searchParams.name || "Untitled Session"
-    const category = () => searchParams.category || ""
-    const difficulty = () => searchParams.difficulty || ""
-    const format = () => searchParams.format || ""
+    const category = () => searchParams.category || "Mixed"
+    const difficulty = () => searchParams.difficulty || "Mixed"
+    const format = () => searchParams.format || "Multiple Choice Question"
 
     const [generatedQuestions, setGeneratedQuestions] = createSignal<Question[]>([])
     const [approvedQuestions, setApprovedQuestions] = createSignal<Question[]>([])
@@ -28,10 +30,10 @@ const MultipleChoiceQuestions: Component = () => {
 
         // Simulate API call to generate questions
         setTimeout(() => {
-            const mockQuestions = generateMockQuestions("multiple-choice", "mixed", "easy", 3)
+            const mockQuestions = generateMockQuestions("general", "easy", 3)
             setGeneratedQuestions(mockQuestions)
             setIsGenerating(false)
-        }, 1500)
+        }, 2500)
     }
 
     const handleApproveQuestion = (question: Question) => {
@@ -61,22 +63,22 @@ const MultipleChoiceQuestions: Component = () => {
                     <h1 class="text-3xl font-bold">{sessionName()}</h1>
                     <div class="flex flex-wrap gap-2 mt-2">
                         <Show when={category()}>
-              <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                {category()}
-              </span>
+                          <span
+                              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Category: {category()}
+                          </span>
                         </Show>
                         <Show when={difficulty()}>
-              <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                {difficulty()}
-              </span>
+                          <span
+                              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Difficulty: {difficulty()}
+                          </span>
                         </Show>
                         <Show when={format()}>
-              <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                {format()}
-              </span>
+                          <span
+                              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {format()}
+                          </span>
                         </Show>
                     </div>
                 </div>
@@ -179,8 +181,10 @@ const MultipleChoiceQuestions: Component = () => {
                         <div class="space-y-4">
                             <For each={generatedQuestions()}>
                                 {(question) => (
-                                    <QuestionCard question={question} onApprove={handleApproveQuestion}
-                                                  onEdit={handleEditQuestion}/>
+                                    <QuestionCard
+                                        question={question}
+                                        onApprove={handleApproveQuestion}
+                                        onEdit={handleEditQuestion}/>
                                 )}
                             </For>
                         </div>
