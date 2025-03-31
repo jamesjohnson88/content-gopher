@@ -1,7 +1,20 @@
 package multiple_choice_question
 
+import "github.com/google/uuid"
+
+// todo - this is all quick and dirty and should probably use some form of map instead in future
+
 type Category string
 type Difficulty string
+
+type MultipleChoiceQuestion struct {
+	Id              uuid.UUID      `json:"id"`
+	Category        Category       `json:"category"`
+	Difficulty      Difficulty     `json:"difficulty"`
+	Text            string         `json:"text"`
+	PossibleAnswers map[int]string `json:"possibleAnswers"`
+	CorrectAnswer   int            `json:"correctAnswer"`
+}
 
 const (
 	Title      string = "Multiple Choice Question"
@@ -21,61 +34,40 @@ const (
 	CategorySpaceAstronomy      Category = "space_astronomy"
 	CategorySportsGames         Category = "sports_games"
 
-	// CategoriesList excludes 'mixed' as it already encompasses the finer grain categories
+	// CategoriesList is for use within prompts to outline the available question categories when creating the content
 	CategoriesList = "" +
-		"General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, " +
-		"Sports & Games, Computer Science & Technology, Mathematics & Logic, Food & Drink, " +
-		"Mythology & Religion, Space & Astronomy, Art & Design"
+		"general_knowledge, science_nature, history_politics, geography, entertainment, " +
+		"sports_games, computer_science_tech, mathematics_logic, food_drink, " +
+		"mythology_religion, space_astronomy, art_design"
 
+	DifficultyMixed    Difficulty = "mixed"
 	DifficultyVeryEasy Difficulty = "very_easy"
 	DifficultyEasy     Difficulty = "easy"
 	DifficultyMedium   Difficulty = "medium"
 	DifficultyHard     Difficulty = "hard"
+	DifficultyVeryHard Difficulty = "very_hard"
+
+	// DifficultiesList is for use within prompts to outline the available difficulty levels when creating the content
+	DifficultiesList = "very_easy, easy, medium, hard, very_hard"
 )
 
-type MultipleChoiceQuestion struct {
-	Id              string         `json:"id"`
-	Category        Category       `json:"category"`
-	Difficulty      Difficulty     `json:"difficulty"`
-	Text            string         `json:"text"`
-	PossibleAnswers map[int]string `json:"possibleAnswers"`
-	CorrectAnswer   int            `json:"correctAnswer"`
+func (c *Category) IsValid() bool {
+	switch *c {
+	case CategoryMixed, CategoryArtDesign, CategoryComputerScienceTech,
+		CategoryEntertainment, CategoryFoodDrink, CategoryGeneralKnowledge,
+		CategoryGeography, CategoryHistoryPolitics, CategoryMathematicsLogic,
+		CategoryMythologyReligion, CategoryScienceNature,
+		CategorySpaceAstronomy, CategorySportsGames:
+		return true
+	}
+	return false
 }
 
-// example
-var prompt = `Acting as a content creator for fun and engaging quizzes, 
-	you must create a question that conforms to the following JSON model:
-
-	{
-		"category": "Geography",
-		"difficulty": "very easy",
-		"text": "What is the capital of France?",
-		"possibleAnswers": {
-		"1": "Paris",
-		"2": "London",
-		"3": "Rome",
-		"4": "Berlin"
-	},
-		"correctAnswer": 1
+func (d *Difficulty) IsValid() bool {
+	switch *d {
+	case DifficultyMixed, DifficultyVeryEasy, DifficultyEasy,
+		DifficultyMedium, DifficultyHard, DifficultyVeryHard:
+		return true
 	}
-
-	The available categories are: General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, 
-	Sports & Games, Computer Science & Technology, Mathematics & Logic, Food & Drink, Mythology & Religion, Space & Astronomy, Art & Design`
-
-/*
-  Example:
-
-	  {
-		"id": "1d1f9ae2-5c88-4b5c-8bbd-32f5d6243e42",
-		"category": "Geography",
-		"difficulty": "very easy",
-		"text": "What is the capital of France?",
-		"possibleAnswers": {
-		  "1": "Paris",
-		  "2": "London",
-		  "3": "Rome",
-		  "4": "Berlin"
-		},
-		"correctAnswer": 1
-	  }
-*/
+	return false
+}

@@ -3,7 +3,6 @@ package sessions
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/jamesjohnson88/content-gopher/internal/config"
 	"github.com/jamesjohnson88/content-gopher/internal/files"
 	"github.com/jamesjohnson88/content-gopher/models/sessions"
@@ -22,8 +21,6 @@ func NewSessionHandler(cfg *config.Config) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		spew.Dump(newSession)
 
 		dir, err := os.Getwd()
 		if err != nil {
