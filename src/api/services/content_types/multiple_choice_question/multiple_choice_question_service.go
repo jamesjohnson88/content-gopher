@@ -1,10 +1,15 @@
 package multiple_choice_question
 
 import (
+	"context"
+	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/google/generative-ai-go/genai"
 	"github.com/jamesjohnson88/content-gopher/internal/ai"
 	. "github.com/jamesjohnson88/content-gopher/models/content_types/multiple_choice_question"
 	s "github.com/jamesjohnson88/content-gopher/models/sessions"
+	"strings"
+	"time"
 )
 
 func GetSessionConfigOptions() []s.SessionOption {
@@ -43,48 +48,67 @@ func GetSessionConfigOptions() []s.SessionOption {
 	}
 }
 
-func HandleContentGeneration(c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
+func HandleContentGeneration(additional string, c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
 	questions := make([]MultipleChoiceQuestion, 0)
 
-	_ = ai.ConfigureForFactualContent(gemini)
+	model := ai.ConfigureForFactualJsonContent(gemini)
+	prompt := getPrompt(additional, c, d)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	result, err := model.GenerateContent(ctx, genai.Text(prompt))
+	if err != nil {
+		return nil, fmt.Errorf("gemini API error: %w", err)
+	}
+
+	spew.Dump(result)
 
 	return questions, nil
 }
 
-// example
-var prompt = `Acting as a content creator for fun and engaging quizzes, 
-	you must create a question that conforms to the following JSON model:
+func getPrompt(additional string, c Category, d Difficulty) string {
+	catText := ""
+	if c == CategoryMixed {
+		catText = fmt.Sprintf("Please select questions using a mixture of the following categories: %s.", CategoriesList)
+	} else {
+		catText = fmt.Sprintf("Please select questions that all align with the category of %q.", c)
+	}
+
+	diffText := ""
+	if d == DifficultyMixed {
+		diffText = fmt.Sprintf("Please select questions using a mixture of the following difficulties: %s.", DifficultiesList)
+	} else {
+		diffText = fmt.Sprintf("Please select questions that all have an estimated difficulty of %q.", d)
+	}
+
+	prompt := basePrompt
+	prompt = strings.Replace(prompt, "{additionalInstructions}", additional, 1)
+	prompt = strings.Replace(prompt, "{catText}", catText, 1)
+	prompt = strings.Replace(prompt, "{diffText}", diffText, 1)
+
+	return prompt
+}
+
+var basePrompt = `Acting as a content creator for fun and engaging quizzes, 
+	you must create an array of 10 questions that conform to the following JSON model:
 
 	{
 		"category": "Geography",
 		"difficulty": "very easy",
 		"text": "What is the capital of France?",
 		"possibleAnswers": {
-		"1": "Paris",
-		"2": "London",
-		"3": "Rome",
-		"4": "Berlin"
-	},
+			"1": "Paris",
+			"2": "London",
+			"3": "Rome",
+			"4": "Berlin"
+		},
 		"correctAnswer": 1
 	}
 
-	The available categories are: General Knowledge, Science & Nature, History & Politics, Geography, Entertainment & Pop Culture, 
-	Sports & Games, Computer Science & Technology, Mathematics & Logic, Food & Drink, Mythology & Religion, Space & Astronomy, Art & Design`
+	Further detail:
+	{additionalInstructions}
 
-/*
-  Example:
+	{catText}
 
-	  {
-		"id": "1d1f9ae2-5c88-4b5c-8bbd-32f5d6243e42",
-		"category": "Geography",
-		"difficulty": "very easy",
-		"text": "What is the capital of France?",
-		"possibleAnswers": {
-		  "1": "Paris",
-		  "2": "London",
-		  "3": "Rome",
-		  "4": "Berlin"
-		},
-		"correctAnswer": 1
-	  }
-*/
+	{diffText}`

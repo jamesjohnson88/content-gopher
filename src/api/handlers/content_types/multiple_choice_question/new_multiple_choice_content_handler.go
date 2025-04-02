@@ -9,23 +9,36 @@ import (
 	"net/http"
 )
 
+type multipleChoiceQuestionFetchParams struct {
+	Category       mcqMod.Category
+	Difficulty     mcqMod.Difficulty
+	AdditionalInfo string
+}
+
 func NewMultipleChoiceContentHandler(cfg *config.Config, ai *genai.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		catParam := r.URL.Query().Get("cParam")
-		diffParam := r.URL.Query().Get("dParam")
-		if catParam == "" || diffParam == "" {
-			http.Error(w, "required parameters were not present", http.StatusBadRequest)
+		if ai == nil {
+			http.Error(w, "genai client was nil", http.StatusBadRequest)
 			return
 		}
 
-		category := mcqMod.Category(catParam)
-		difficulty := mcqMod.Difficulty(diffParam)
-		if !category.IsValid() || !difficulty.IsValid() {
+		var params multipleChoiceQuestionFetchParams
+		err := json.NewDecoder(r.Body).Decode(&params)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if !params.Category.IsValid() || !params.Difficulty.IsValid() {
 			http.Error(w, "category or difficulty value was invalid", http.StatusBadRequest)
 			return
 		}
 
-		questions, err := mcqSvc.HandleContentGeneration(category, difficulty, ai.GenerativeModel(cfg.GeminiModel))
+		questions, err := mcqSvc.HandleContentGeneration(
+			params.AdditionalInfo,
+			params.Category,
+			params.Difficulty,
+			ai.GenerativeModel(cfg.GeminiModel))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

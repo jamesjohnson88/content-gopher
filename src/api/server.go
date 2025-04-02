@@ -20,7 +20,7 @@ func NewServer(cfg *config.Config) http.Handler {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer geminiClient.Close()
+	// todo - can't defer this - add a more graceful shutdown/cleanup for it
 
 	addRoutes(
 		mux,
@@ -46,5 +46,5 @@ func addRoutes(mux *http.ServeMux, cfg *config.Config, geminiClient *genai.Clien
 	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
 
 	// multiple choice question session
-	mux.Handle("GET /api/content/multiple-choice-question", mcq.NewMultipleChoiceContentHandler(cfg, geminiClient))
+	mux.Handle("POST /api/content/multiple-choice-question/fetch", mcq.NewMultipleChoiceContentHandler(cfg, geminiClient))
 }
