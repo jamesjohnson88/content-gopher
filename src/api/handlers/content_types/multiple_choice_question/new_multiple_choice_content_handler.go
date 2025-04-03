@@ -17,11 +17,6 @@ type multipleChoiceQuestionFetchParams struct {
 
 func NewMultipleChoiceContentHandler(cfg *config.Config, ai *genai.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if ai == nil {
-			http.Error(w, "genai client was nil", http.StatusBadRequest)
-			return
-		}
-
 		var params multipleChoiceQuestionFetchParams
 		err := json.NewDecoder(r.Body).Decode(&params)
 		if err != nil {
@@ -49,5 +44,8 @@ func NewMultipleChoiceContentHandler(cfg *config.Config, ai *genai.Client) http.
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 	}
 }

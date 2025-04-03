@@ -2,8 +2,8 @@ package multiple_choice_question
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/google/generative-ai-go/genai"
 	"github.com/jamesjohnson88/content-gopher/internal/ai"
 	. "github.com/jamesjohnson88/content-gopher/models/content_types/multiple_choice_question"
@@ -49,12 +49,10 @@ func GetSessionConfigOptions() []s.SessionOption {
 }
 
 func HandleContentGeneration(additional string, c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
-	questions := make([]MultipleChoiceQuestion, 0)
-
 	model := ai.ConfigureForFactualJsonContent(gemini)
 	prompt := getPrompt(additional, c, d)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	result, err := model.GenerateContent(ctx, genai.Text(prompt))
@@ -62,9 +60,15 @@ func HandleContentGeneration(additional string, c Category, d Difficulty, gemini
 		return nil, fmt.Errorf("gemini API error: %w", err)
 	}
 
-	spew.Dump(result)
+	content := ai.GetContentFromCandidates(result.Candidates)
 
-	return questions, nil
+	var rsQuestions []MultipleChoiceQuestion
+	err = json.Unmarshal([]byte(content), &rsQuestions)
+	if err != nil {
+		return nil, fmt.Errorf("json unmarshal error: %w", err)
+	}
+
+	return rsQuestions, nil
 }
 
 func getPrompt(additional string, c Category, d Difficulty) string {
@@ -91,24 +95,28 @@ func getPrompt(additional string, c Category, d Difficulty) string {
 }
 
 var basePrompt = `Acting as a content creator for fun and engaging quizzes, 
-	you must create an array of 10 questions that conform to the following JSON model:
+	you must create an array of exactly 10 **multiple-choice questions**. Each question must strictly adhere to this JSON structure:
 
 	{
-		"category": "Geography",
-		"difficulty": "very easy",
-		"text": "What is the capital of France?",
+		"category": "<string>",
+		"difficulty": "<string>",
+		"text": "<string>",
 		"possibleAnswers": {
-			"1": "Paris",
-			"2": "London",
-			"3": "Rome",
-			"4": "Berlin"
+			"1": "<string>",
+			"2": "<string>",
+			"3": "<string>",
+			"4": "<string>"
 		},
-		"correctAnswer": 1
+		"correctAnswer": <integer>
 	}
 
-	Further detail:
-	{additionalInstructions}
+	DO NOT include any extra fields or explanations.
+
+	The response must be a valid JSON array with no additional commentary, explanations, or escape sequences.
+	All categories and difficulties should exactly match ones from the options specified below.
 
 	{catText}
 
-	{diffText}`
+	{diffText}
+
+	Further detail: {additionalInstructions}`

@@ -10,3 +10,13 @@ func ConfigureForFactualJsonContent(gm *genai.GenerativeModel) *genai.Generative
 	gm.ResponseMIMEType = "application/json"
 	return gm
 }
+
+func GetContentFromCandidates(c []*genai.Candidate) string {
+	var contentText string
+	if len(c) > 0 && len(c[0].Content.Parts) > 0 {
+		if textValue, ok := c[0].Content.Parts[0].(genai.Text); ok {
+			contentText = string(textValue)
+		}
+	}
+	return contentText
+}
