@@ -12,13 +12,13 @@ interface QuestionCardProps {
 export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps) {
     const [isEditing, setIsEditing] = createSignal(false)
     const [editedText, setEditedText] = createSignal(question.text)
-    const [editedOptions, setEditedOptions] = createSignal<string[]>(question.options || [])
+    const [editedOptions, setEditedOptions] = createSignal<string[]>(question.possibleAnswers || [])
     const [editedAnswer, setEditedAnswer] = createSignal(question.correctAnswer)
 
     const handleSaveEdit = () => {
         onEdit(question.id, {
             text: editedText(),
-            options: editedOptions(),
+            possibleAnswers: editedOptions(),
             correctAnswer: editedAnswer(),
         })
         setIsEditing(false)
@@ -26,7 +26,7 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
 
     const handleCancelEdit = () => {
         setEditedText(question.text)
-        setEditedOptions(question.options || [])
+        setEditedOptions(question.possibleAnswers || [])
         setEditedAnswer(question.correctAnswer)
         setIsEditing(false)
     }
@@ -37,6 +37,11 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
         setEditedOptions(newOptions)
     }
 
+    // Add this near the top of your component after the signal definitions
+    console.log("Full question object:", question);
+    console.log("possibleAnswers:", question.possibleAnswers);
+    console.log("options type:", typeof question.possibleAnswers);
+    console.log("is array:", Array.isArray(question.possibleAnswers));
     return (
         <div class="border rounded-lg shadow-sm">
             <div class="p-6">
@@ -50,63 +55,43 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                     </Show>
                 </h3>
                 <div class="mt-4">
-                    <Show when={isEditing()}>
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Options</label>
-                                <For each={editedOptions()}>
-                                    {(option, index) => (
+                    <Show when={!isEditing()}>
+                        <div class="space-y-2">
+                            {/* Convert the object to an array of entries and sort by key */}
+                            <For each={Object.entries(question.possibleAnswers || {}).sort((a, b) => Number(a[0]) - Number(b[0]))}>
+                                {(entry, index) => {
+                                    const [key, option] = entry;
+                                    return (
                                         <div class="flex items-center gap-2">
                                             <div
-                                                class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                                    index() + 1 === Number(question.correctAnswer)
+                                                        ? "bg-green-100 text-green-700 border border-green-200"
+                                                        : "bg-gray-100 text-gray-700 border border-gray-200"
+                                                }`}
+                                            >
                                                 {String.fromCharCode(65 + index())}
                                             </div>
-                                            <input
-                                                type="text"
-                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                                value={option}
-                                                onInput={(e) => updateOption(index(), e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-                                </For>
+                                            <span>{option}</span>
+                                            <Show when={index() + 1 === Number(question.correctAnswer)}>
+                                                <span class="text-green-600 text-sm ml-2">(Correct)</span>
+                                            </Show>
 
-                                <div class="mt-4">
-                                    <label class="block text-sm font-medium text-gray-700">Correct Answer</label>
-                                    <div class="mt-2 space-y-2">
-                                        <For each={editedOptions()}>
-                                            {(option, index) => (
-                                                <div class="flex items-center space-x-2">
-                                                    <input
-                                                        type="radio"
-                                                        id={`option-${index()}`}
-                                                        name="correct-answer"
-                                                        value={option}
-                                                        checked={editedAnswer() === option}
-                                                        onChange={() => setEditedAnswer(option)}
-                                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                                    />
-                                                    <label html-for={`option-${index()}`}
-                                                           class="text-sm text-gray-700">
-                                                        {option}
-                                                    </label>
-                                                </div>
-                                            )}
-                                        </For>
-                                    </div>
-                                </div>
-                            </div>
+                                        </div>
+                                    );
+                                }}
+                            </For>
                         </div>
                     </Show>
 
-                    <Show when={!isEditing()}>
+                    <Show when={isEditing()}>
                         <div class="space-y-2">
-                            <For each={question.options}>
+                            <For each={question.possibleAnswers}>
                                 {(option, index) => (
                                     <div class="flex items-center gap-2">
                                         <div
                                             class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                option === question.correctAnswer
+                                                index() + 1 === Number(question.correctAnswer)
                                                     ? "bg-green-100 text-green-700 border border-green-200"
                                                     : "bg-gray-100 text-gray-700 border border-gray-200"
                                             }`}
@@ -114,7 +99,7 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                                             {String.fromCharCode(65 + index())}
                                         </div>
                                         <span>{option}</span>
-                                        <Show when={option === question.correctAnswer}>
+                                        <Show when={index() + 1 === Number(question.correctAnswer)}>
                                             <span class="text-green-600 text-sm ml-2">(Correct)</span>
                                         </Show>
                                     </div>
