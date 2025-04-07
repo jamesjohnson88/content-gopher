@@ -37,11 +37,6 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
         setEditedOptions(newOptions)
     }
 
-    // Add this near the top of your component after the signal definitions
-    console.log("Full question object:", question);
-    console.log("possibleAnswers:", question.possibleAnswers);
-    console.log("options type:", typeof question.possibleAnswers);
-    console.log("is array:", Array.isArray(question.possibleAnswers));
     return (
         <div class="border rounded-lg shadow-sm">
             <div class="p-6">
