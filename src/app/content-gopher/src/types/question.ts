@@ -1,10 +1,8 @@
-﻿export type QuestionType = "multiple-choice" | "true-false" | "higher-lower"
-
+﻿// todo - change to MCQ
 export interface Question {
     id: string
     text: string
-    type: QuestionType
-    options?: string[]
+    possibleAnswers: string[]
     correctAnswer: string
     category: string
     difficulty: string

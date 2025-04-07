@@ -1,4 +1,4 @@
-﻿import {createSignal, createEffect, createResource, Show, For, Component} from "solid-js"
+﻿import {Component, createEffect, createResource, createSignal, For, Show} from "solid-js"
 import {useSearchParams} from "@solidjs/router"
 import {QuestionGenerator} from "../../components/QuestionGenerator"
 import {QuestionCard} from "../../components/QuestionCard"
@@ -35,19 +35,26 @@ const MultipleChoiceQuestions: Component = () => {
         }
     })
 
-    async function handleGenerateQuestions() :Promise<Question[]> {
-        const response = await fetch('https://redacted.mock.pstmn.io/api/content/multiple-choice-question/fetch', {
+    async function handleGenerateQuestions(): Promise<Question[]> {
+        const response = await fetch('https://ed8f08b2-6d88-4e51-9024-940b82da3070.mock.pstmn.io/api/content/multiple-choice-question/fetch', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({})
-        })
-
+        });
         if (!response.ok) throw new Error("Could not fetch data");
 
-        return response.json()
+        const rawData = await response.json();
+
+        return rawData.map((q: Question): Question => ({
+            ...q,
+            possibleAnswers: Object.entries(q.possibleAnswers || {})
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .map(([, value]) => value),
+        }) as Question);
     }
+
 
     const handleApproveQuestion = (question: Question) => {
         setApprovedQuestions([...approvedQuestions(), question])
@@ -236,90 +243,30 @@ const MultipleChoiceQuestions: Component = () => {
                                     <div class="p-6">
                                         <h3 class="text-lg font-medium">{question.text}</h3>
                                         <div class="mt-4">
-                                            <Show when={question.type === "multiple-choice"}>
-                                                <div class="space-y-2">
-                                                    <For each={question.options}>
-                                                        {(option, index) => (
-                                                            <div class="flex items-center gap-2">
-                                                                <div
-                                                                    class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                                        option === question.correctAnswer
-                                                                            ? "bg-green-100 text-green-700 border border-green-200"
-                                                                            : "bg-gray-100 text-gray-700 border border-gray-200"
-                                                                    }`}
-                                                                >
-                                                                    {String.fromCharCode(65 + index())}
-                                                                </div>
-                                                                <span>{option}</span>
-                                                                <Show when={option === question.correctAnswer}>
+                                            <div class="space-y-2">
+                                                <For each={question.possibleAnswers}>
+                                                    {(option, index) => (
+                                                        <div class="flex items-center gap-2">
+                                                            <div
+                                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                                                    option === question.correctAnswer
+                                                                        ? "bg-green-100 text-green-700 border border-green-200"
+                                                                        : "bg-gray-100 text-gray-700 border border-gray-200"
+                                                                }`}
+                                                            >
+                                                                {String.fromCharCode(65 + index())}
+                                                            </div>
+                                                            <span>{option}</span>
+                                                            <Show when={option === question.correctAnswer}>
                                   <span
                                       class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
                                     Correct
                                   </span>
-                                                                </Show>
-                                                            </div>
-                                                        )}
-                                                    </For>
-                                                </div>
-                                            </Show>
-
-                                            <Show when={question.type === "true-false"}>
-                                                <div class="space-y-2">
-                                                    <div
-                                                        class={`flex items-center gap-2 ${
-                                                            question.correctAnswer === "True" ? "text-green-700" : "text-gray-700"
-                                                        }`}
-                                                    >
-                                                        <div
-                                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                                question.correctAnswer === "True"
-                                                                    ? "bg-green-100 border border-green-200"
-                                                                    : "bg-gray-100 border border-gray-200"
-                                                            }`}
-                                                        >
-                                                            T
+                                                            </Show>
                                                         </div>
-                                                        <span>True</span>
-                                                        <Show when={question.correctAnswer === "True"}>
-                              <span
-                                  class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                Correct
-                              </span>
-                                                        </Show>
-                                                    </div>
-                                                    <div
-                                                        class={`flex items-center gap-2 ${
-                                                            question.correctAnswer === "False" ? "text-green-700" : "text-gray-700"
-                                                        }`}
-                                                    >
-                                                        <div
-                                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                                question.correctAnswer === "False"
-                                                                    ? "bg-green-100 border border-green-200"
-                                                                    : "bg-gray-100 border border-gray-200"
-                                                            }`}
-                                                        >
-                                                            F
-                                                        </div>
-                                                        <span>False</span>
-                                                        <Show when={question.correctAnswer === "False"}>
-                              <span
-                                  class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                Correct
-                              </span>
-                                                        </Show>
-                                                    </div>
-                                                </div>
-                                            </Show>
-
-                                            <Show when={question.type === "higher-lower"}>
-                                                <div class="mt-2">
-                          <span
-                              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                            Answer: {question.correctAnswer}
-                          </span>
-                                                </div>
-                                            </Show>
+                                                    )}
+                                                </For>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="px-6 py-3 bg-gray-50 rounded-b-lg">
