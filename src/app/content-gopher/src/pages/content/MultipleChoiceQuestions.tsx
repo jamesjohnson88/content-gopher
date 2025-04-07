@@ -1,8 +1,7 @@
-﻿import {createSignal, createEffect, Show, For, Component} from "solid-js"
+﻿import {createSignal, createEffect, createResource, Show, For, Component} from "solid-js"
 import {useSearchParams} from "@solidjs/router"
 import {QuestionGenerator} from "../../components/QuestionGenerator"
 import {QuestionCard} from "../../components/QuestionCard"
-import {generateMockQuestions} from "../../lib/mock-data"
 import {Question} from "../../types/question";
 
 const MultipleChoiceQuestions: Component = () => {
@@ -20,20 +19,34 @@ const MultipleChoiceQuestions: Component = () => {
     const [exportSuccess, setExportSuccess] = createSignal(false)
     const [activeTab, setActiveTab] = createSignal("generate")
 
-    // Generate initial questions
-    createEffect(() => {
-        handleGenerateQuestions()
+    const [questionData] = createResource(() => {
+        //  called automatically on component mount
+        return handleGenerateQuestions()
     })
 
-    const handleGenerateQuestions = () => {
-        setIsGenerating(true)
-
-        // Simulate API call to generate questions
-        setTimeout(() => {
-            const mockQuestions = generateMockQuestions("general", "easy", 3)
-            setGeneratedQuestions(mockQuestions)
+    createEffect(() => {
+        if (questionData() && !questionData.loading) {
+            setIsGenerating(true)
+            const newData = questionData();
+            if (Array.isArray(newData)) {
+                setGeneratedQuestions(prev => [...prev, ...newData]);
+            }
             setIsGenerating(false)
-        }, 2500)
+        }
+    })
+
+    async function handleGenerateQuestions() :Promise<Question[]> {
+        const response = await fetch('https://redacted.mock.pstmn.io/api/content/multiple-choice-question/fetch', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({})
+        })
+
+        if (!response.ok) throw new Error("Could not fetch data");
+
+        return response.json()
     }
 
     const handleApproveQuestion = (question: Question) => {

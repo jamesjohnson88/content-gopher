@@ -99,7 +99,6 @@ const NewSession: Component = () => {
 
             if (!response.ok) throw new Error("Could not create session");
 
-            console.log(response);
             navigate("/content/multiple-choice-question", { replace: true }); //url.responseUrl // todo
         } catch (error) {
             console.log(error);
