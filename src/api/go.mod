@@ -3,8 +3,8 @@ module github.com/jamesjohnson88/content-gopher
 go 1.24.1
 
 require (
-	github.com/davecgh/go-spew v1.1.1
 	github.com/google/generative-ai-go v0.19.0
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.226.0
 )
@@ -20,7 +20,6 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.5 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect

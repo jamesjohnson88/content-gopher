@@ -5,14 +5,15 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"github.com/jamesjohnson88/content-gopher/internal/config"
-	"github.com/joho/godotenv"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/jamesjohnson88/content-gopher/internal/config"
+	"github.com/joho/godotenv"
 )
 
 //go:embed .version
