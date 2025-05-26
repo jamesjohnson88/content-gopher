@@ -1,8 +1,15 @@
 package config
 
-import "os"
+import (
+	"context"
+	"fmt"
+
+	"github.com/caarlos0/env/v6"
+)
 
 type Config struct {
+	ServiceName            string `env:"SERVICE_NAME" envDefault:"content-gopher"`
+	Environment            string `env:"ENVIRONMENT" envDefault:"development"`
 	Host                   string `env:"HOST,required"`
 	Port                   string `env:"PORT,required"`
 	DefaultOutputDirectory string `env:"DEFAULT_OUTPUT_DIRECTORY"`
@@ -10,12 +17,10 @@ type Config struct {
 	GeminiModel            string `env:"GEMINI_MODEL,required"`
 }
 
-func GetConfig() *Config {
-	return &Config{
-		Host:                   os.Getenv("HOST"),
-		Port:                   os.Getenv("PORT"),
-		DefaultOutputDirectory: os.Getenv("DEFAULT_OUTPUT_DIRECTORY"),
-		GeminiApiKey:           os.Getenv("GEMINI_API_KEY"),
-		GeminiModel:            os.Getenv("GEMINI_MODEL"),
+func LoadConfig(ctx context.Context) (*Config, error) {
+	cfg := &Config{}
+	if err := env.Parse(cfg); err != nil {
+		return nil, fmt.Errorf("failed to parse env vars into valid config: %w", err)
 	}
+	return cfg, nil
 }

@@ -13,11 +13,14 @@ import (
 	"time"
 
 	"github.com/jamesjohnson88/content-gopher/internal/config"
-	"github.com/joho/godotenv"
 )
 
 //go:embed .version
 var version string
+
+const (
+	componentNameMain = "main"
+)
 
 func main() {
 	println("Content Gopher: version", version)
@@ -29,7 +32,8 @@ func main() {
 }
 
 func run() error {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	logOpts := &slog.HandlerOptions{
 		AddSource: true,
@@ -37,14 +41,10 @@ func run() error {
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, logOpts))
 	slog.SetDefault(logger)
 
-	err := godotenv.Load()
+	cfg, err := config.LoadConfig(ctx)
 	if err != nil {
-		slog.Error("env_load_error",
-			slog.String("err", err.Error()),
-		)
+		return fmt.Errorf("failed to load config: %w", err)
 	}
-
-	cfg := config.GetConfig()
 
 	s := NewServer(cfg)
 	httpServer := &http.Server{
@@ -52,36 +52,40 @@ func run() error {
 		Handler: s,
 	}
 
-	go func() {
-		slog.Info("server",
-			slog.Bool("started", true),
-			slog.String("version", version),
-			slog.String("addr", httpServer.Addr),
-		)
-		if lsErr := httpServer.ListenAndServe(); lsErr != nil && !errors.Is(lsErr, http.ErrServerClosed) {
-			slog.Error("server_error",
-				slog.String("err", lsErr.Error()),
-			)
-		}
-	}()
+	serverCtx, serverCancel := context.WithCancel(ctx)
+	defer serverCancel()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		<-ctx.Done()
-		shutdownCtx := context.Background()
-		shutdownCtx, cancel := context.WithTimeout(shutdownCtx, 10*time.Second)
-		defer cancel()
-		if sdErr := httpServer.Shutdown(shutdownCtx); sdErr != nil {
-			slog.ErrorContext(
-				shutdownCtx,
-				"shutdown_error",
-				slog.String("err", sdErr.Error()),
+		slog.Info("server",
+			slog.Bool("started", true),
+			slog.String("version", version),
+			slog.String("addr", httpServer.Addr),
+			slog.String("component", componentNameMain),
+		)
+		if lsErr := httpServer.ListenAndServe(); lsErr != nil && !errors.Is(lsErr, http.ErrServerClosed) {
+			slog.Error("server_error",
+				slog.String("err", lsErr.Error()),
+				slog.String("component", componentNameMain),
 			)
+			serverCancel()
 		}
 	}()
 
-	wg.Wait() // ensure all goroutines complete before exiting
+	<-serverCtx.Done()
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+
+	if sdErr := httpServer.Shutdown(shutdownCtx); sdErr != nil {
+		slog.Error("shutdown_error",
+			slog.String("err", sdErr.Error()),
+			slog.String("component", componentNameMain),
+		)
+	}
+
+	wg.Wait()
 	return nil
 }

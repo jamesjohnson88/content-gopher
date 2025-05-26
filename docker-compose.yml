@@ -1,16 +1,19 @@
 services:
   api:
     build:
-      context: ./src/api
+      context: .\src\api
       dockerfile: Dockerfile
     env_file:
-      - ./src/api/.env
+      - .\src\api\.env
     ports:
       - "7272:7272"
     environment:
+      - SERVICE_NAME=content-gopher
+      - ENVIRONMENT=development
       - HOST=0.0.0.0
       - PORT=7272
       - DEFAULT_OUTPUT_DIRECTORY=/gopher-output
+      - GEMINI_MODEL=gemini-2.0-pro-exp-02-05 # GEMINI_API_KEY will be loaded from .env file
     volumes:
       - ~/Desktop/gopher-output:/gopher-output
     restart: unless-stopped 
