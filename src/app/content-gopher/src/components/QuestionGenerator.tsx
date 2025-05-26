@@ -4,7 +4,7 @@ import { createSignal } from "solid-js"
 import { Show } from "solid-js"
 
 interface QuestionGeneratorProps {
-    onGenerate: () => void
+    onGenerate: (prompt: string) => void
     isGenerating: () => boolean
 }
 
@@ -55,7 +55,7 @@ export function QuestionGenerator({ onGenerate, isGenerating }: QuestionGenerato
             </div>
             <div class="px-6 pb-6">
                 <button
-                    onClick={onGenerate}
+                    onClick={() => onGenerate(prompt())}
                     disabled={isGenerating()}
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-all duration-200 relative overflow-hidden"
                 >

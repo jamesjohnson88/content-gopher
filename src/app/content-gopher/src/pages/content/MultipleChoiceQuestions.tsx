@@ -45,7 +45,7 @@ const MultipleChoiceQuestions: Component = () => {
         localStorage.setItem(getSessionKey(), JSON.stringify(newQuestions))
     }
 
-    async function handleGenerateQuestions(): Promise<void> {
+    async function handleGenerateQuestions(prompt: string): Promise<void> {
         if (isGenerating()) return
 
         setIsGenerating(true)
@@ -58,7 +58,7 @@ const MultipleChoiceQuestions: Component = () => {
                 body: JSON.stringify({
                     category: category(),
                     difficulty: difficulty(),
-                    additionalInfo: ""
+                    additionalInfo: prompt
                 })
             })
 
