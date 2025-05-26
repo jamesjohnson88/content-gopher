@@ -27,7 +27,7 @@ nuke:
 
 # Hidden alias' (won't show in --list)
 [private]
-u: api-up
+up: api-up
 
 [private]
 bake: api-bake

@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
+	"log"
+	"net/http"
+
 	"github.com/google/generative-ai-go/genai"
 	mcq "github.com/jamesjohnson88/content-gopher/handlers/content_types/multiple_choice_question"
 	"github.com/jamesjohnson88/content-gopher/handlers/sessions"
 	"github.com/jamesjohnson88/content-gopher/internal/config"
 	"github.com/jamesjohnson88/content-gopher/internal/middleware"
 	"google.golang.org/api/option"
-	"log"
-	"net/http"
 )
 
 // todo - pass a ctx to allow for server cleanup? overkill?
@@ -44,6 +45,7 @@ func addRoutes(mux *http.ServeMux, cfg *config.Config, geminiClient *genai.Clien
 
 	// provide the available options for creating sessions
 	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
+	mux.Handle("GET /api/sessions/directory", sessions.DirectoryHandler(cfg))
 
 	// multiple choice question session
 	mux.Handle("POST /api/content/multiple-choice-question/fetch", mcq.NewMultipleChoiceContentHandler(cfg, geminiClient))
