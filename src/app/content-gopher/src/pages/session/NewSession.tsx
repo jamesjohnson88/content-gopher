@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import {createSignal, createResource, createMemo, createEffect } from "solid-js"
+import { createSignal, createResource, createMemo, createEffect } from "solid-js"
 import { useNavigate } from "@solidjs/router";
 
 
@@ -36,8 +36,8 @@ type NewSessionForm = {
 const NewSession: Component = () => {
     const [sessionName, setSessionName] = createSignal("")
     const [format, setFormat] = createSignal("")
-    const [formData, setFormData] = createSignal<Record<string,string>>({})
-    const [formErrs, setFormErrs] = createSignal<Record<string,string>>({})
+    const [formData, setFormData] = createSignal<Record<string, string>>({})
+    const [formErrs, setFormErrs] = createSignal<Record<string, string>>({})
     const [loading, setLoading] = createSignal<boolean>(false)
 
     const [sessionData] = createResource(fetchData);
@@ -50,12 +50,12 @@ const NewSession: Component = () => {
         return response.json();
     }
 
-    function addFormField(fieldName:string) {
-        setFormData((prevState) => ({...prevState, [fieldName]: "" }));
-        setFormErrs((prevState) => ({...prevState, [fieldName]: "" }));
+    function addFormField(fieldName: string) {
+        setFormData((prevState) => ({ ...prevState, [fieldName]: "" }));
+        setFormErrs((prevState) => ({ ...prevState, [fieldName]: "" }));
     }
 
-    const handleContentFormatChange = (value:string) => {
+    const handleContentFormatChange = (value: string) => {
         setFormat(value)
     }
 
@@ -99,7 +99,8 @@ const NewSession: Component = () => {
 
             if (!response.ok) throw new Error("Could not create session");
 
-            navigate("/content/multiple-choice-question", { replace: true }); //url.responseUrl // todo
+            const responseData = await response.json();
+            navigate(`/content/multiple-choice-question?name=${encodeURIComponent(sessionName())}&category=${encodeURIComponent(formData().category)}&difficulty=${encodeURIComponent(formData().difficulty)}&format=${encodeURIComponent(format())}`, { replace: true });
         } catch (error) {
             console.log(error);
         } finally {
@@ -157,7 +158,7 @@ const NewSession: Component = () => {
                                         addFormField(opt.content_format);
                                         return <div class="space-y-2">
                                             <label html-for={opt.content_format}
-                                                   class="block text-sm font-medium text-gray-700">
+                                                class="block text-sm font-medium text-gray-700">
                                                 {opt.title}
                                             </label>
                                             <select
@@ -198,9 +199,9 @@ const NewSession: Component = () => {
                                 stroke="currentColor"
                             >
                                 <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </button>
                     </div>

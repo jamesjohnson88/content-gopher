@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/google/generative-ai-go/genai"
+	"github.com/google/uuid"
 	"github.com/jamesjohnson88/content-gopher/internal/ai"
 	. "github.com/jamesjohnson88/content-gopher/models/content_types/multiple_choice_question"
 	s "github.com/jamesjohnson88/content-gopher/models/sessions"
-	"strings"
-	"time"
 )
 
 func GetSessionConfigOptions() []s.SessionOption {
@@ -48,11 +50,12 @@ func GetSessionConfigOptions() []s.SessionOption {
 	}
 }
 
-func HandleContentGeneration(additional string, c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
+// todo - accept a ctx from calling function
+func HandleContentGeneration(ctx context.Context, additional string, c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
 	model := ai.ConfigureForFactualJsonContent(gemini)
 	prompt := getPrompt(additional, c, d)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 
 	result, err := model.GenerateContent(ctx, genai.Text(prompt))
@@ -66,6 +69,11 @@ func HandleContentGeneration(additional string, c Category, d Difficulty, gemini
 	err = json.Unmarshal([]byte(content), &rsQuestions)
 	if err != nil {
 		return nil, fmt.Errorf("json unmarshal error: %w", err)
+	}
+
+	// Add UUIDs to each question
+	for i := range rsQuestions {
+		rsQuestions[i].Id = uuid.New()
 	}
 
 	return rsQuestions, nil

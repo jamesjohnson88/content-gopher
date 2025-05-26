@@ -2,11 +2,12 @@ package multiple_choice_question
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/google/generative-ai-go/genai"
 	"github.com/jamesjohnson88/content-gopher/internal/config"
 	mcqMod "github.com/jamesjohnson88/content-gopher/models/content_types/multiple_choice_question"
 	mcqSvc "github.com/jamesjohnson88/content-gopher/services/content_types/multiple_choice_question"
-	"net/http"
 )
 
 type multipleChoiceQuestionFetchParams struct {
@@ -30,6 +31,7 @@ func NewMultipleChoiceContentHandler(cfg *config.Config, ai *genai.Client) http.
 		}
 
 		questions, err := mcqSvc.HandleContentGeneration(
+			r.Context(),
 			params.AdditionalInfo,
 			params.Category,
 			params.Difficulty,

@@ -13,7 +13,7 @@ services:
       - HOST=0.0.0.0
       - PORT=7272
       - DEFAULT_OUTPUT_DIRECTORY=/gopher-output
-      - GEMINI_MODEL=gemini-2.0-pro-exp-02-05 # GEMINI_API_KEY will be loaded from .env file
+      - GEMINI_MODEL=gemini-2.5-flash-preview-05-20 # GEMINI_API_KEY will be loaded from .env file
     volumes:
       - ~/Desktop/gopher-output:/gopher-output
     restart: unless-stopped 
