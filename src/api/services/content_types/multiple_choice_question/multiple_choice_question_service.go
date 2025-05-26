@@ -50,7 +50,6 @@ func GetSessionConfigOptions() []s.SessionOption {
 	}
 }
 
-// todo - accept a ctx from calling function
 func HandleContentGeneration(ctx context.Context, additional string, c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
 	model := ai.ConfigureForFactualJsonContent(gemini)
 	prompt := getPrompt(additional, c, d)
@@ -71,7 +70,6 @@ func HandleContentGeneration(ctx context.Context, additional string, c Category,
 		return nil, fmt.Errorf("json unmarshal error: %w", err)
 	}
 
-	// Add UUIDs to each question
 	for i := range rsQuestions {
 		rsQuestions[i].Id = uuid.New()
 	}

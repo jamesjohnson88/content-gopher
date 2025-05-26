@@ -24,7 +24,6 @@ const MultipleChoiceQuestions: Component = () => {
     const [exportSuccess, setExportSuccess] = createSignal(false)
     const [activeTab, setActiveTab] = createSignal("generate")
 
-    // Question generation
     async function handleGenerateQuestions(): Promise<void> {
         if (isGenerating()) return
 
@@ -65,11 +64,9 @@ const MultipleChoiceQuestions: Component = () => {
 
     // Question management
     const handleApproveQuestion = (question: Question) => {
-        // Get current state
         const currentGenerated = questions().generated
         const currentApproved = questions().approved
 
-        // Find the index of the question to approve
         const questionIndex = currentGenerated.findIndex(q => q.id === question.id)
 
         if (questionIndex === -1) {
@@ -77,13 +74,10 @@ const MultipleChoiceQuestions: Component = () => {
             return
         }
 
-        // Create new arrays
         const newGenerated = [...currentGenerated]
         const [approvedQuestion] = newGenerated.splice(questionIndex, 1) // Remove only the approved question
-
         const newApproved = [...currentApproved, approvedQuestion]
 
-        // Update state atomically
         setQuestions({
             generated: newGenerated,
             approved: newApproved
@@ -199,7 +193,7 @@ const MultipleChoiceQuestions: Component = () => {
 
             <Show when={activeTab() === "generate"}>
                 <div class="space-y-6">
-                    <QuestionGenerator onGenerate={handleGenerateQuestions} isGenerating={isGenerating()} />
+                    <QuestionGenerator onGenerate={handleGenerateQuestions} isGenerating={isGenerating} />
 
                     <Show
                         when={generatedQuestions().length > 0}
