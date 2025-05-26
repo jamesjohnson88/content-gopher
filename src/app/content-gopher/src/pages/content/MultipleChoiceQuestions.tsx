@@ -13,16 +13,37 @@ const MultipleChoiceQuestions: Component = () => {
     const format = () => searchParams.format || "Multiple Choice Question"
 
     // State management
+    const getSessionKey = () => {
+        return `questions_${sessionName()}_${category()}_${difficulty()}_${format()}`
+    }
+
+    const initialQuestions = (() => {
+        const savedQuestions = localStorage.getItem(getSessionKey())
+        if (savedQuestions) {
+            try {
+                return JSON.parse(savedQuestions) as { generated: Question[], approved: Question[] }
+            } catch (e) {
+                console.error('Error parsing saved questions:', e)
+            }
+        }
+        return {
+            generated: [],
+            approved: []
+        }
+    })()
+
     const [questions, setQuestions] = createSignal<{
         generated: Question[],
         approved: Question[]
-    }>({
-        generated: [],
-        approved: []
-    })
+    }>(initialQuestions)
     const [isGenerating, setIsGenerating] = createSignal(false)
     const [exportSuccess, setExportSuccess] = createSignal(false)
     const [activeTab, setActiveTab] = createSignal("generate")
+
+    // Save to localStorage whenever questions change
+    const saveQuestions = (newQuestions: { generated: Question[], approved: Question[] }) => {
+        localStorage.setItem(getSessionKey(), JSON.stringify(newQuestions))
+    }
 
     async function handleGenerateQuestions(): Promise<void> {
         if (isGenerating()) return
@@ -51,10 +72,12 @@ const MultipleChoiceQuestions: Component = () => {
                     .map(([, value]) => value),
             }))
 
-            setQuestions(prev => ({
-                ...prev,
-                generated: [...prev.generated, ...newQuestions]
-            }))
+            const updatedQuestions = {
+                ...questions(),
+                generated: [...questions().generated, ...newQuestions]
+            }
+            setQuestions(updatedQuestions)
+            saveQuestions(updatedQuestions)
         } catch (error) {
             console.error('Error generating questions:', error)
         } finally {
@@ -75,13 +98,15 @@ const MultipleChoiceQuestions: Component = () => {
         }
 
         const newGenerated = [...currentGenerated]
-        const [approvedQuestion] = newGenerated.splice(questionIndex, 1) // Remove only the approved question
+        const [approvedQuestion] = newGenerated.splice(questionIndex, 1)
         const newApproved = [...currentApproved, approvedQuestion]
 
-        setQuestions({
+        const newQuestions = {
             generated: newGenerated,
             approved: newApproved
-        })
+        }
+        setQuestions(newQuestions)
+        saveQuestions(newQuestions)
     }
 
     const handleEditQuestion = (id: string, updatedQuestion: Partial<Question>) => {
@@ -90,20 +115,24 @@ const MultipleChoiceQuestions: Component = () => {
             q.id === id ? { ...q, ...updatedQuestion } : q
         )
 
-        setQuestions(prev => ({
-            ...prev,
+        const newQuestions = {
+            ...questions(),
             generated: newGenerated
-        }))
+        }
+        setQuestions(newQuestions)
+        saveQuestions(newQuestions)
     }
 
     const handleRemoveApproved = (id: string) => {
         const currentApproved = questions().approved
         const newApproved = currentApproved.filter(q => q.id !== id)
 
-        setQuestions(prev => ({
-            ...prev,
+        const newQuestions = {
+            ...questions(),
             approved: newApproved
-        }))
+        }
+        setQuestions(newQuestions)
+        saveQuestions(newQuestions)
     }
 
     // Memoize the generated questions list to prevent unnecessary re-renders
