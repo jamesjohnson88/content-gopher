@@ -135,6 +135,18 @@ const MultipleChoiceQuestions: Component = () => {
         saveQuestions(newQuestions)
     }
 
+    const handleDiscardQuestion = (id: string) => {
+        const currentGenerated = questions().generated
+        const newGenerated = currentGenerated.filter(q => q.id !== id)
+
+        const newQuestions = {
+            ...questions(),
+            generated: newGenerated
+        }
+        setQuestions(newQuestions)
+        saveQuestions(newQuestions)
+    }
+
     // Memoize the generated questions list to prevent unnecessary re-renders
     const generatedQuestions = () => questions().generated
     const approvedQuestions = () => questions().approved
@@ -249,6 +261,7 @@ const MultipleChoiceQuestions: Component = () => {
                                         question={question}
                                         onApprove={handleApproveQuestion}
                                         onEdit={handleEditQuestion}
+                                        onDiscard={handleDiscardQuestion}
                                     />
                                 )}
                             </For>

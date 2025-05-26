@@ -7,9 +7,10 @@ interface QuestionCardProps {
     question: Question
     onApprove: (question: Question) => void
     onEdit: (id: string, updatedQuestion: Partial<Question>) => void
+    onDiscard: (id: string) => void
 }
 
-export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps) {
+export function QuestionCard({ question, onApprove, onEdit, onDiscard }: QuestionCardProps) {
     const [isEditing, setIsEditing] = createSignal(false)
     const [editedText, setEditedText] = createSignal(question.text)
     const [editedOptions, setEditedOptions] = createSignal<string[]>(question.possibleAnswers || [])
@@ -42,11 +43,11 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
             <div class="p-6">
                 <h3 class="text-lg font-medium">
                     <Show when={isEditing()} fallback={question.text}>
-            <textarea
-                value={editedText()}
-                onInput={(e) => setEditedText(e.target.value)}
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
+                        <textarea
+                            value={editedText()}
+                            onInput={(e) => setEditedText(e.target.value)}
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
                     </Show>
                 </h3>
                 <div class="mt-4">
@@ -59,11 +60,10 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                                     return (
                                         <div class="flex items-center gap-2">
                                             <div
-                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                    index() + 1 === Number(question.correctAnswer)
-                                                        ? "bg-green-100 text-green-700 border border-green-200"
-                                                        : "bg-gray-100 text-gray-700 border border-gray-200"
-                                                }`}
+                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${index() + 1 === Number(question.correctAnswer)
+                                                    ? "bg-green-100 text-green-700 border border-green-200"
+                                                    : "bg-gray-100 text-gray-700 border border-gray-200"
+                                                    }`}
                                             >
                                                 {String.fromCharCode(65 + index())}
                                             </div>
@@ -85,11 +85,10 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                                 {(option, index) => (
                                     <div class="flex items-center gap-2">
                                         <div
-                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                                index() + 1 === Number(question.correctAnswer)
-                                                    ? "bg-green-100 text-green-700 border border-green-200"
-                                                    : "bg-gray-100 text-gray-700 border border-gray-200"
-                                            }`}
+                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${index() + 1 === Number(question.correctAnswer)
+                                                ? "bg-green-100 text-green-700 border border-green-200"
+                                                : "bg-gray-100 text-gray-700 border border-gray-200"
+                                                }`}
                                         >
                                             {String.fromCharCode(65 + index())}
                                         </div>
@@ -104,7 +103,7 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                     </Show>
                 </div>
             </div>
-            <div class="px-6 py-4 bg-gray-50 border-t rounded-b-lg flex justify-between">
+            <div class="px-6 py-4 bg-gray-50 border-t rounded-b-lg flex justify-between items-center">
                 <Show
                     when={isEditing()}
                     fallback={
@@ -129,21 +128,43 @@ export function QuestionCard({ question, onApprove, onEdit }: QuestionCardProps)
                                 </svg>
                                 Edit
                             </button>
-                            <button
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm flex items-center gap-1"
-                                onClick={() => onApprove(question)}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
+                            <div class="flex items-center gap-4">
+                                <button
+                                    class="text-red-600 hover:text-red-800 border border-red-300 bg-white hover:bg-red-50 px-3 py-1.5 rounded text-sm flex items-center gap-1"
+                                    onClick={() => onDiscard(question.id)}
                                 >
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Approve
-                            </button>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                        />
+                                    </svg>
+                                    Discard
+                                </button>
+                                <button
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm flex items-center gap-1"
+                                    onClick={() => onApprove(question)}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Approve
+                                </button>
+                            </div>
                         </>
                     }
                 >
