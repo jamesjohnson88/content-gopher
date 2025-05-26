@@ -194,13 +194,18 @@ const MultipleChoiceQuestions: Component = () => {
                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex space-x-8">
                         <button
-                            class={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab() === "generate"
+                            class={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab() === "generate"
                                 ? "border-blue-500 text-blue-600"
                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                                 }`}
                             onClick={() => setActiveTab("generate")}
                         >
-                            Generate Questions
+                            Question Pool
+                            <Show when={generatedQuestions().length > 0}>
+                                <span class="ml-2 bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs">
+                                    {generatedQuestions().length}
+                                </span>
+                            </Show>
                         </button>
                         <button
                             class={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab() === "approved"
