@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: ./src/api
+      dockerfile: Dockerfile
+    env_file:
+      - ./src/api/.env
+    ports:
+      - "7272:7272"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=7272
+      - DEFAULT_OUTPUT_DIRECTORY=/gopher-output
+    volumes:
+      - ~/Desktop/gopher-output:/gopher-output
+    restart: unless-stopped 
