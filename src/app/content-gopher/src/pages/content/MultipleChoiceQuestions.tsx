@@ -147,6 +147,30 @@ const MultipleChoiceQuestions: Component = () => {
         saveQuestions(newQuestions)
     }
 
+    // Function to send an approved question back to the generated pool
+    const handleSendBackToPool = (question: Question) => {
+        const currentApproved = questions().approved
+        const currentGenerated = questions().generated
+
+        const questionIndex = currentApproved.findIndex(q => q.id === question.id)
+
+        if (questionIndex === -1) {
+            console.error('Approved question not found:', question)
+            return
+        }
+
+        const newApproved = [...currentApproved]
+        const [sentBackQuestion] = newApproved.splice(questionIndex, 1)
+        const newGenerated = [...currentGenerated, sentBackQuestion]
+
+        const newQuestions = {
+            generated: newGenerated,
+            approved: newApproved
+        }
+        setQuestions(newQuestions)
+        saveQuestions(newQuestions)
+    }
+
     // Memoize the generated questions list to prevent unnecessary re-renders
     const generatedQuestions = () => questions().generated
     const approvedQuestions = () => questions().approved
@@ -313,7 +337,16 @@ const MultipleChoiceQuestions: Component = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="px-6 py-3 bg-gray-50 rounded-b-lg">
+                                    <div class="px-6 py-3 bg-gray-50 rounded-b-lg flex items-center gap-4">
+                                        <button
+                                            class="text-gray-600 hover:text-gray-800 text-sm flex items-center gap-1"
+                                            onClick={() => handleSendBackToPool(question)}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+                                            </svg>
+                                            Send Back
+                                        </button>
                                         <button
                                             class="text-red-600 hover:text-red-800 text-sm flex items-center gap-1"
                                             onClick={() => handleRemoveApproved(question.id)}
