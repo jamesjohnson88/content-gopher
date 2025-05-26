@@ -48,6 +48,12 @@ const MultipleChoiceQuestions: Component = () => {
     async function handleGenerateQuestions(prompt: string): Promise<void> {
         if (isGenerating()) return
 
+        // Check if we've reached the 30 question limit
+        if (questions().generated.length >= 30) {
+            // alert("You've reached the maximum limit of 30 questions in the pool. Please approve or discard some questions before generating more.")
+            return
+        }
+
         setIsGenerating(true)
         try {
             const response = await fetch('http://localhost:7272/api/content/multiple-choice-question/fetch', {
@@ -263,7 +269,11 @@ const MultipleChoiceQuestions: Component = () => {
 
             <Show when={activeTab() === "generate"}>
                 <div class="space-y-6">
-                    <QuestionGenerator onGenerate={handleGenerateQuestions} isGenerating={isGenerating} />
+                    <QuestionGenerator
+                        onGenerate={handleGenerateQuestions}
+                        isGenerating={isGenerating}
+                        generatedCount={() => generatedQuestions().length}
+                    />
 
                     <Show
                         when={generatedQuestions().length > 0}
