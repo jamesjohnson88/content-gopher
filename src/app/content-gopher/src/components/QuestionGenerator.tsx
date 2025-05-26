@@ -12,10 +12,10 @@ export function QuestionGenerator({ onGenerate, isGenerating }: QuestionGenerato
     const [prompt, setPrompt] = createSignal("")
 
     return (
-        <div class="border rounded-lg shadow-sm relative">
+        <div class="border rounded-lg shadow-sm relative overflow-hidden">
             <Show when={isGenerating()}>
-                <div class="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 flex items-center justify-center">
-                    <div class="text-center p-8 bg-white rounded-lg shadow-lg border border-blue-100 animate-pulse">
+                <div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/80">
+                    <div class="text-center">
                         <svg
                             class="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4"
                             xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +30,7 @@ export function QuestionGenerator({ onGenerate, isGenerating }: QuestionGenerato
                             ></path>
                         </svg>
                         <p class="text-gray-700 font-medium text-lg">Generating questions...</p>
-                        <p class="text-gray-500 text-sm mt-2">This may take a few moments</p>
+                        <p class="text-gray-600 text-sm mt-2">This may take a few moments</p>
                     </div>
                 </div>
             </Show>
@@ -59,24 +59,8 @@ export function QuestionGenerator({ onGenerate, isGenerating }: QuestionGenerato
                     disabled={isGenerating()}
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-all duration-200 relative overflow-hidden"
                 >
-                    <Show when={isGenerating()}>
-                        <div class="absolute inset-0 bg-blue-500 animate-pulse"></div>
-                    </Show>
                     {isGenerating() ? (
                         <>
-                            <svg
-                                class="animate-spin h-5 w-5 text-white relative z-10"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path
-                                    class="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
-                            </svg>
                             <span class="relative z-10">Generating Questions...</span>
                         </>
                     ) : (
