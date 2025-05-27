@@ -39,8 +39,7 @@ const MultipleChoiceQuestions: Component = () => {
     }
 
     const formatMap: { [key: string]: string } = {
-        "multiple_choice_question": "Multiple Choice Question",
-        // Add other formats here if needed in the future
+        "multiple_choice_question": "Multiple Choice Question"
     }
 
     const categoryDisplay = () => categoryMap[categoryParam().toString()] || categoryParam()
@@ -85,7 +84,6 @@ const MultipleChoiceQuestions: Component = () => {
 
         // Check if we've reached the 30 question limit
         if (questions().generated.length >= 30) {
-            // alert("You've reached the maximum limit of 30 questions in the pool. Please approve or discard some questions before generating more.")
             return
         }
 
