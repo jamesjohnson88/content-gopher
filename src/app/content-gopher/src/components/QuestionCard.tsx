@@ -137,7 +137,11 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                                         </div>
                                         <span>{option}</span>
                                         <Show when={index() + 1 === Number(question.correctAnswer)}>
-                                            <span class="text-green-600 text-sm ml-2">(Correct)</span>
+                                            <span class="text-green-600 text-sm ml-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block align-text-bottom" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
                                         </Show>
                                     </div>
                                 )}
@@ -158,7 +162,7 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                                         >
                                             {String.fromCharCode(65 + index())}
                                         </div>
-                                        <div class="relative flex-grow">
+                                        <div class="relative flex-grow flex items-center">
                                             <input
                                                 type="text"
                                                 value={option}
@@ -168,7 +172,7 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                                                     }`}
                                             />
                                             <Show when={index() + 1 === Number(editedAnswer())}>
-                                                <div class="absolute right-2 top-1/2 -translate-y-1/2 text-green-600">
+                                                <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none text-green-600">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                                     </svg>

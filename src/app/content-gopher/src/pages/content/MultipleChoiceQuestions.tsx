@@ -356,6 +356,14 @@ const MultipleChoiceQuestions: Component = () => {
                             {(question) => (
                                 <div class="border rounded-lg shadow-sm">
                                     <div class="p-6">
+                                        <div class="flex flex-wrap gap-2 mb-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                Category: {categoryMap[question.category] || question.category}
+                                            </span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                Difficulty: {difficultyMap[question.difficulty] || question.difficulty}
+                                            </span>
+                                        </div>
                                         <h3 class="text-lg font-medium">{question.text}</h3>
                                         <div class="mt-4">
                                             <div class="space-y-2">
@@ -363,7 +371,7 @@ const MultipleChoiceQuestions: Component = () => {
                                                     {(option, index) => (
                                                         <div class="flex items-center gap-2">
                                                             <div
-                                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${option === question.correctAnswer
+                                                                class={`w-6 h-6 rounded-full flex items-center justify-center ${index() + 1 === Number(question.correctAnswer)
                                                                     ? "bg-green-100 text-green-700 border border-green-200"
                                                                     : "bg-gray-100 text-gray-700 border border-gray-200"
                                                                     }`}
@@ -371,9 +379,11 @@ const MultipleChoiceQuestions: Component = () => {
                                                                 {String.fromCharCode(65 + index())}
                                                             </div>
                                                             <span>{option}</span>
-                                                            <Show when={option === question.correctAnswer}>
-                                                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                                                    Correct
+                                                            <Show when={index() + 1 === Number(question.correctAnswer)}>
+                                                                <span class="ml-2 text-green-600 text-sm">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block align-text-bottom" viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                                    </svg>
                                                                 </span>
                                                             </Show>
                                                         </div>
@@ -382,9 +392,9 @@ const MultipleChoiceQuestions: Component = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="px-6 py-3 bg-gray-50 rounded-b-lg flex items-center gap-4">
+                                    <div class="px-6 py-3 bg-gray-50 rounded-b-lg flex items-center justify-end gap-4">
                                         <button
-                                            class="text-gray-600 hover:text-gray-800 text-sm flex items-center gap-1"
+                                            class="text-gray-700 hover:text-gray-900 border border-gray-300 bg-white hover:bg-gray-50 px-3 py-1.5 rounded text-sm flex items-center gap-1"
                                             onClick={() => handleSendBackToPool(question)}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -393,7 +403,7 @@ const MultipleChoiceQuestions: Component = () => {
                                             Send Back
                                         </button>
                                         <button
-                                            class="text-red-600 hover:text-red-800 text-sm flex items-center gap-1"
+                                            class="text-red-600 hover:text-red-800 border border-red-300 bg-white hover:bg-red-50 px-3 py-1.5 rounded text-sm flex items-center gap-1"
                                             onClick={() => handleRemoveApproved(question.id)}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
