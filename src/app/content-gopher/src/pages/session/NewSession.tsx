@@ -50,9 +50,14 @@ const NewSession: Component = () => {
         return response.json();
     }
 
-    function addFormField(fieldName: string) {
-        setFormData((prevState) => ({ ...prevState, [fieldName]: "" }));
-        setFormErrs((prevState) => ({ ...prevState, [fieldName]: "" }));
+    function initializeFormFields(options: OptionGroup[]) {
+        const initialData: Record<string, string> = {};
+        options.forEach((opt) => {
+            if (opt.options.length > 0) {
+                initialData[opt.content_format] = opt.options[0].value;
+            }
+        });
+        setFormData(initialData);
     }
 
     const handleContentFormatChange = (value: string) => {
@@ -71,14 +76,16 @@ const NewSession: Component = () => {
     createEffect(() => {
         const data = sessionData();
         if (data && data.session_types.length === 1) {
-            setFormat(data.session_types[0].content_format);
+            const defaultFormat = data.session_types[0].content_format;
+            setFormat(defaultFormat);
+            initializeFormFields(data.session_types[0].options);
         }
     });
 
     const isFormValid = createMemo(() => {
         return sessionName() && format() && !loading()
             && Object.values(formErrs()).every((error) => error === "")
-            && Object.values(formData()).every((value) => value.trim() !== "");
+            && Object.entries(formData()).every(([key, value]) => value.trim() !== "");
     });
 
     async function handleCreateSession() {
@@ -155,7 +162,6 @@ const NewSession: Component = () => {
                             {sessionData()?.session_types.filter((s) => s.content_format == format()).map((st) => {
                                 return (
                                     st.options.map((opt) => {
-                                        addFormField(opt.content_format);
                                         return <div class="space-y-2">
                                             <label html-for={opt.content_format}
                                                 class="block text-sm font-medium text-gray-700">
@@ -165,7 +171,7 @@ const NewSession: Component = () => {
                                                 id={opt.content_format}
                                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                 onChange={(e) => handleInputChange(opt.content_format, e.target.value)}
-                                                value=""
+                                                value={formData()[opt.content_format] || ""}
                                             >
                                                 <option value="select-value" disabled>
                                                     Select {opt.title}
