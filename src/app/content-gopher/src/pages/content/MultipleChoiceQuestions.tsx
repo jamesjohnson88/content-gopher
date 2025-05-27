@@ -8,13 +8,48 @@ const MultipleChoiceQuestions: Component = () => {
     // URL params
     const [searchParams] = useSearchParams()
     const sessionName = () => searchParams.name || "Untitled Session"
-    const category = () => searchParams.category || "mixed"
-    const difficulty = () => searchParams.difficulty || "mixed"
-    const format = () => searchParams.format || "Multiple Choice Question"
+    const categoryParam = () => searchParams.category || "mixed"
+    const difficultyParam = () => searchParams.difficulty || "mixed"
+    const formatParam = () => searchParams.format || "multiple_choice_question"
+
+    // Mappings for display values
+    const categoryMap: { [key: string]: string } = {
+        "mixed": "Mixed Categories",
+        "art_design": "Art & Design",
+        "computer_science_tech": "Computer Science & Tech",
+        "entertainment": "Entertainment",
+        "food_drink": "Food & Drink",
+        "general_knowledge": "General Knowledge",
+        "geography": "Geography",
+        "history_politics": "History & Politics",
+        "mathematics_logic": "Mathematics & Logic",
+        "mythology_religion": "Mythology & Religion",
+        "science_nature": "Science & Nature",
+        "space_astronomy": "Space & Astronomy",
+        "sports_games": "Sports & Games",
+    }
+
+    const difficultyMap: { [key: string]: string } = {
+        "mixed": "Mixed Difficulty",
+        "very_easy": "Very Easy",
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard",
+        "very_hard": "Very Hard",
+    }
+
+    const formatMap: { [key: string]: string } = {
+        "multiple_choice_question": "Multiple Choice Question",
+        // Add other formats here if needed in the future
+    }
+
+    const categoryDisplay = () => categoryMap[categoryParam().toString()] || categoryParam()
+    const difficultyDisplay = () => difficultyMap[difficultyParam().toString()] || difficultyParam()
+    const formatDisplay = () => formatMap[formatParam().toString()] || formatParam()
 
     // State management
     const getSessionKey = () => {
-        return `questions_${sessionName()}_${category()}_${difficulty()}_${format()}`
+        return `questions_${sessionName()}_${categoryParam()}_${difficultyParam()}_${formatParam()}`
     }
 
     const initialQuestions = (() => {
@@ -62,8 +97,8 @@ const MultipleChoiceQuestions: Component = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    category: category(),
-                    difficulty: difficulty(),
+                    category: categoryParam(),
+                    difficulty: difficultyParam(),
                     additionalInfo: prompt
                 })
             })
@@ -192,19 +227,19 @@ const MultipleChoiceQuestions: Component = () => {
                 <div>
                     <h1 class="text-3xl font-bold">{sessionName()}</h1>
                     <div class="flex flex-wrap gap-2 mt-2">
-                        <Show when={category()}>
+                        <Show when={categoryParam()}>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Category: {category()}
+                                Category: {categoryDisplay()}
                             </span>
                         </Show>
-                        <Show when={difficulty()}>
+                        <Show when={difficultyParam()}>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Difficulty: {difficulty()}
+                                Difficulty: {difficultyDisplay()}
                             </span>
                         </Show>
-                        <Show when={format()}>
+                        <Show when={formatParam()}>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                {format()}
+                                {formatDisplay()}
                             </span>
                         </Show>
                     </div>
