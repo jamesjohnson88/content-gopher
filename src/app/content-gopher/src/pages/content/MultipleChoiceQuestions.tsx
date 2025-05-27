@@ -8,8 +8,8 @@ const MultipleChoiceQuestions: Component = () => {
     // URL params
     const [searchParams] = useSearchParams()
     const sessionName = () => searchParams.name || "Untitled Session"
-    const categoryParam = () => searchParams.category || "mixed"
-    const difficultyParam = () => searchParams.difficulty || "mixed"
+    const categoryParam = () => (searchParams.category as string) || "mixed"
+    const difficultyParam = () => (searchParams.difficulty as string) || "mixed"
     const formatParam = () => searchParams.format || "multiple_choice_question"
 
     // Mappings for display values
@@ -329,6 +329,8 @@ const MultipleChoiceQuestions: Component = () => {
                                         onApprove={handleApproveQuestion}
                                         onEdit={handleEditQuestion}
                                         onDiscard={handleDiscardQuestion}
+                                        sessionCategory={categoryParam()}
+                                        sessionDifficulty={difficultyParam()}
                                     />
                                 )}
                             </For>
