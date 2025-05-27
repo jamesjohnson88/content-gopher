@@ -81,21 +81,34 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard }: Questio
 
                     <Show when={isEditing()}>
                         <div class="space-y-2">
-                            <For each={question.possibleAnswers}>
+                            <For each={editedOptions()}>
                                 {(option, index) => (
                                     <div class="flex items-center gap-2">
                                         <div
-                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${index() + 1 === Number(question.correctAnswer)
+                                            class={`w-6 h-6 rounded-full flex items-center justify-center ${index() + 1 === Number(editedAnswer())
                                                 ? "bg-green-100 text-green-700 border border-green-200"
                                                 : "bg-gray-100 text-gray-700 border border-gray-200"
                                                 }`}
                                         >
                                             {String.fromCharCode(65 + index())}
                                         </div>
-                                        <span>{option}</span>
-                                        <Show when={index() + 1 === Number(question.correctAnswer)}>
-                                            <span class="text-green-600 text-sm ml-2">(Correct)</span>
-                                        </Show>
+                                        <div class="flex-1 relative">
+                                            <input
+                                                type="text"
+                                                value={option}
+                                                onInput={(e) => updateOption(index(), e.target.value)}
+                                                disabled={index() + 1 === Number(editedAnswer())}
+                                                class={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${index() + 1 === Number(editedAnswer()) ? "bg-gray-50 cursor-not-allowed pr-8" : ""
+                                                    }`}
+                                            />
+                                            <Show when={index() + 1 === Number(editedAnswer())}>
+                                                <div class="absolute right-2 top-1/2 -translate-y-1/2 text-green-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </Show>
+                                        </div>
                                     </div>
                                 )}
                             </For>
