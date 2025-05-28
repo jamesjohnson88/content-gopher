@@ -13,6 +13,7 @@ import (
 type SessionInfo struct {
 	Filename      string   `json:"filename"`
 	Name          string   `json:"name"`
+	Type          string   `json:"type"`
 	Categories    []string `json:"categories"`
 	Difficulties  []string `json:"difficulties"`
 	QuestionCount int      `json:"questionCount"`
@@ -43,58 +44,75 @@ func DirectoryHandler(cfg *config.Config) http.HandlerFunc {
 			return
 		}
 
-		entries, err := os.ReadDir(outDir)
+		// Get all subdirectories (question types)
+		typeDirs, err := os.ReadDir(outDir)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		var sessions []SessionInfo
-		for _, entry := range entries {
-			if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-				// Read and analyze the session file
-				filePath := filepath.Join(outDir, entry.Name())
-				data, err := os.ReadFile(filePath)
-				if err != nil {
-					continue // Skip files we can't read
-				}
+		for _, typeDir := range typeDirs {
+			if !typeDir.IsDir() {
+				continue // Skip non-directory entries
+			}
 
-				var questions []map[string]interface{}
-				if err := json.Unmarshal(data, &questions); err != nil {
-					continue // Skip invalid JSON files
-				}
+			questionType := typeDir.Name()
+			typePath := filepath.Join(outDir, questionType)
 
-				// Analyze the questions
-				categories := make(map[string]bool)
-				difficulties := make(map[string]bool)
-				for _, q := range questions {
-					if cat, ok := q["category"].(string); ok {
-						categories[cat] = true
+			// Read all JSON files in this type directory
+			entries, err := os.ReadDir(typePath)
+			if err != nil {
+				continue // Skip directories we can't read
+			}
+
+			for _, entry := range entries {
+				if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
+					// Read and analyze the session file
+					filePath := filepath.Join(typePath, entry.Name())
+					data, err := os.ReadFile(filePath)
+					if err != nil {
+						continue // Skip files we can't read
 					}
-					if diff, ok := q["difficulty"].(string); ok {
-						difficulties[diff] = true
+
+					var questions []map[string]interface{}
+					if err := json.Unmarshal(data, &questions); err != nil {
+						continue // Skip invalid JSON files
 					}
-				}
 
-				// Convert maps to slices
-				var catSlice []string
-				for cat := range categories {
-					catSlice = append(catSlice, cat)
-				}
-				var diffSlice []string
-				for diff := range difficulties {
-					diffSlice = append(diffSlice, diff)
-				}
+					// Analyze the questions
+					categories := make(map[string]bool)
+					difficulties := make(map[string]bool)
+					for _, q := range questions {
+						if cat, ok := q["category"].(string); ok {
+							categories[cat] = true
+						}
+						if diff, ok := q["difficulty"].(string); ok {
+							difficulties[diff] = true
+						}
+					}
 
-				// Create session info
-				sessionName := strings.TrimSuffix(entry.Name(), ".json")
-				sessions = append(sessions, SessionInfo{
-					Filename:      entry.Name(),
-					Name:          sessionName,
-					Categories:    catSlice,
-					Difficulties:  diffSlice,
-					QuestionCount: len(questions),
-				})
+					// Convert maps to slices
+					var catSlice []string
+					for cat := range categories {
+						catSlice = append(catSlice, cat)
+					}
+					var diffSlice []string
+					for diff := range difficulties {
+						diffSlice = append(diffSlice, diff)
+					}
+
+					// Create session info
+					sessionName := strings.TrimSuffix(entry.Name(), ".json")
+					sessions = append(sessions, SessionInfo{
+						Filename:      filepath.Join(questionType, entry.Name()),
+						Name:          sessionName,
+						Type:          questionType,
+						Categories:    catSlice,
+						Difficulties:  diffSlice,
+						QuestionCount: len(questions),
+					})
+				}
 			}
 		}
 
