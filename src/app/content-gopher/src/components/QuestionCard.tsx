@@ -10,9 +10,10 @@ interface QuestionCardProps {
     onDiscard: (id: string) => void
     sessionCategory: string
     sessionDifficulty: string
+    sessionFormat: string
 }
 
-export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCategory, sessionDifficulty }: QuestionCardProps) {
+export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCategory, sessionDifficulty, sessionFormat }: QuestionCardProps) {
     const [isEditing, setIsEditing] = createSignal(false)
     const [editedText, setEditedText] = createSignal(question.text)
     const [editedOptions, setEditedOptions] = createSignal<string[]>(question.possibleAnswers || [])
@@ -44,6 +45,12 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
         "hard": "Hard",
         "very_hard": "Very Hard",
     }
+
+    const formatMap: { [key: string]: string } = {
+        "multiple_choice_question": "Multiple Choice Question"
+    }
+
+    const formatDisplay = () => formatMap[sessionFormat || ''] || sessionFormat
 
     const handleSaveEdit = () => {
         onEdit(question.id, {
@@ -104,12 +111,21 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                             </Show>
                         </>
                     }>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            Category: {categoryMap[question.category] || question.category}
-                        </span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            Difficulty: {difficultyMap[question.difficulty] || question.difficulty}
-                        </span>
+                        <Show when={sessionFormat}>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {formatDisplay()}
+                            </span>
+                        </Show>
+                        <Show when={question.category}>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {categoryMap[question.category] || question.category}
+                            </span>
+                        </Show>
+                        <Show when={question.difficulty}>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                {difficultyMap[question.difficulty] || question.difficulty}
+                            </span>
+                        </Show>
                     </Show>
                 </div>
                 <h3 class="text-lg font-medium">

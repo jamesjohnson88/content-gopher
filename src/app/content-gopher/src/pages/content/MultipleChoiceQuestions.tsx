@@ -279,19 +279,19 @@ const MultipleChoiceQuestions: Component = () => {
                 <div>
                     <h1 class="text-3xl font-bold">{sessionName()}</h1>
                     <div class="flex flex-wrap gap-2 mt-2">
-                        <Show when={category()}>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Category: {categoryDisplay()}
-                            </span>
-                        </Show>
-                        <Show when={difficulty()}>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Difficulty: {difficultyDisplay()}
-                            </span>
-                        </Show>
                         <Show when={formatParam()}>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                 {formatDisplay()}
+                            </span>
+                        </Show>
+                        <Show when={category()}>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {categoryDisplay()}
+                            </span>
+                        </Show>
+                        <Show when={difficulty()}>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                {difficultyDisplay()}
                             </span>
                         </Show>
                     </div>
@@ -397,6 +397,7 @@ const MultipleChoiceQuestions: Component = () => {
                                         onDiscard={handleDiscardQuestion}
                                         sessionCategory={category()}
                                         sessionDifficulty={difficulty()}
+                                        sessionFormat={formatParam()}
                                     />
                                 )}
                             </For>
