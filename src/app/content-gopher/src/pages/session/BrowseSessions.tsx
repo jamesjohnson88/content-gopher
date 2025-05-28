@@ -87,20 +87,12 @@ const BrowseSessions: Component = () => {
                                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                             {session.questionCount} Questions
                                                         </span>
-                                                        <For each={session.categories}>
-                                                            {(category) => (
-                                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                                    {categoryMap[category] || category}
-                                                                </span>
-                                                            )}
-                                                        </For>
-                                                        <For each={session.difficulties}>
-                                                            {(difficulty) => (
-                                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                    {difficultyMap[difficulty] || difficulty}
-                                                                </span>
-                                                            )}
-                                                        </For>
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            {session.categories.length > 1 ? categoryMap["mixed"] : categoryMap[session.categories[0]] || session.categories[0]}
+                                                        </span>
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                            {session.difficulties.length > 1 ? difficultyMap["mixed"] : difficultyMap[session.difficulties[0]] || session.difficulties[0]}
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 <A href={`/sessions/edit/${session.filename}`}>

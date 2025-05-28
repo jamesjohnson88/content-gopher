@@ -26,15 +26,21 @@ const EditSession: Component = () => {
     createEffect(() => {
         const data = sessionData();
         if (data && data.questions.length > 0) {
-            const firstQuestion = data.questions[0];
             const type = params.filename.split('/')[0]; // Get the question type from the filename
             const name = params.filename.split('/')[1].replace('.json', '');
 
             // Convert the type to the format expected by the URL
             const format = type.replace(/_/g, '-');
 
+            // Analyze all questions to determine if we have mixed categories/difficulties
+            const uniqueCategories = new Set(data.questions.map(q => q.category));
+            const uniqueDifficulties = new Set(data.questions.map(q => q.difficulty));
+
+            const category = uniqueCategories.size > 1 ? 'mixed' : data.questions[0].category;
+            const difficulty = uniqueDifficulties.size > 1 ? 'mixed' : data.questions[0].difficulty;
+
             // Redirect to the content generation page with the session data
-            navigate(`/content/${format}?name=${name}&category=${encodeURIComponent(firstQuestion.category)}&difficulty=${encodeURIComponent(firstQuestion.difficulty)}&format=${encodeURIComponent(type)}&edit=true&filename=${encodeURIComponent(params.filename)}`, { replace: true });
+            navigate(`/content/${format}?name=${name}&category=${encodeURIComponent(category)}&difficulty=${encodeURIComponent(difficulty)}&format=${encodeURIComponent(type)}&edit=true&filename=${encodeURIComponent(params.filename)}`, { replace: true });
         }
     });
 
