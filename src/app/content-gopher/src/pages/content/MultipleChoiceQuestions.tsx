@@ -72,7 +72,9 @@ const MultipleChoiceQuestions: Component = () => {
     }>(initialQuestions)
     const [isGenerating, setIsGenerating] = createSignal(false)
     const [exportSuccess, setExportSuccess] = createSignal(false)
+    const [exportError, setExportError] = createSignal<string | null>(null)
     const [activeTab, setActiveTab] = createSignal("generate")
+    const [showExportOptions, setShowExportOptions] = createSignal(false)
 
     // Save to localStorage whenever questions change
     const saveQuestions = (newQuestions: { generated: Question[], approved: Question[] }) => {
@@ -214,9 +216,34 @@ const MultipleChoiceQuestions: Component = () => {
     const generatedQuestions = () => questions().generated
     const approvedQuestions = () => questions().approved
 
-    const handleExport = () => {
-        setExportSuccess(true)
-        setTimeout(() => setExportSuccess(false), 3000)
+    const handleExport = async () => {
+        try {
+            setExportError(null);
+            const response = await fetch("http://localhost:7272/api/sessions/export", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    sessionName: sessionName(),
+                    contentFormat: formatParam(),
+                    content: {
+                        questions: questions().approved
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to export session");
+            }
+
+            setExportSuccess(true);
+            setTimeout(() => setExportSuccess(false), 3000);
+        } catch (error) {
+            console.error("Export failed:", error);
+            setExportError("Failed to export session. Please try again.");
+            setTimeout(() => setExportError(null), 3000);
+        }
     }
 
     return (
@@ -262,6 +289,18 @@ const MultipleChoiceQuestions: Component = () => {
                         <span class="font-medium">Success!</span>
                     </div>
                     <span class="block sm:inline ml-7">Your session has been exported successfully.</span>
+                </div>
+            </Show>
+
+            <Show when={exportError()}>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="font-medium">Error</span>
+                    </div>
+                    <span class="block sm:inline ml-7">{exportError()}</span>
                 </div>
             </Show>
 

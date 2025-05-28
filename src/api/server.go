@@ -46,6 +46,7 @@ func addRoutes(mux *http.ServeMux, cfg *config.Config, geminiClient *genai.Clien
 	// provide the available options for creating sessions
 	mux.Handle("GET /api/sessions/options", sessions.NewSessionOptionsHandler())
 	mux.Handle("GET /api/sessions/directory", sessions.DirectoryHandler(cfg))
+	mux.Handle("POST /api/sessions/export", sessions.ExportSessionHandler(cfg))
 
 	// multiple choice question session
 	mux.Handle("POST /api/content/multiple-choice-question/fetch", mcq.NewMultipleChoiceContentHandler(cfg, geminiClient))
