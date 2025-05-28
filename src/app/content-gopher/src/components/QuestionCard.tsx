@@ -2,6 +2,7 @@
 
 import { createSignal, Show, For } from "solid-js"
 import type { Question } from "../types/question"
+import { categoryMap, difficultyMap, formatMap } from "../types/mappings"
 
 interface QuestionCardProps {
     question: Question
@@ -20,35 +21,6 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
     const [editedAnswer, setEditedAnswer] = createSignal(question.correctAnswer)
     const [editedCategory, setEditedCategory] = createSignal(question.category)
     const [editedDifficulty, setEditedDifficulty] = createSignal(question.difficulty)
-
-    const categoryMap: { [key: string]: string } = {
-        "mixed": "Mixed Categories",
-        "art_design": "Art & Design",
-        "computer_science_tech": "Computer Science & Tech",
-        "entertainment": "Entertainment",
-        "food_drink": "Food & Drink",
-        "general_knowledge": "General Knowledge",
-        "geography": "Geography",
-        "history_politics": "History & Politics",
-        "mathematics_logic": "Mathematics & Logic",
-        "mythology_religion": "Mythology & Religion",
-        "science_nature": "Science & Nature",
-        "space_astronomy": "Space & Astronomy",
-        "sports_games": "Sports & Games",
-    }
-
-    const difficultyMap: { [key: string]: string } = {
-        "mixed": "Mixed Difficulty",
-        "very_easy": "Very Easy",
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard",
-        "very_hard": "Very Hard",
-    }
-
-    const formatMap: { [key: string]: string } = {
-        "multiple_choice_question": "Multiple Choice Question"
-    }
 
     const formatDisplay = () => formatMap[sessionFormat || ''] || sessionFormat
 

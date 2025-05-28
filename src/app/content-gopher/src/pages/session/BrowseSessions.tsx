@@ -1,6 +1,7 @@
 ﻿import type { Component } from 'solid-js';
 import { createResource, Show, For } from 'solid-js';
 import { A } from '@solidjs/router';
+import { categoryMap, difficultyMap } from '../../types/mappings';
 
 // import styles from './App.module.css';
 
@@ -89,14 +90,14 @@ const BrowseSessions: Component = () => {
                                                         <For each={session.categories}>
                                                             {(category) => (
                                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                                    {category}
+                                                                    {categoryMap[category] || category}
                                                                 </span>
                                                             )}
                                                         </For>
                                                         <For each={session.difficulties}>
                                                             {(difficulty) => (
                                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                    {difficulty}
+                                                                    {difficultyMap[difficulty] || difficulty}
                                                                 </span>
                                                             )}
                                                         </For>

@@ -3,6 +3,7 @@ import { useSearchParams } from "@solidjs/router"
 import { QuestionGenerator } from "../../components/QuestionGenerator"
 import { QuestionCard } from "../../components/QuestionCard"
 import { Question } from "../../types/question"
+import { categoryMap, difficultyMap, formatMap } from "../../types/mappings"
 
 const MultipleChoiceQuestions: Component = () => {
     const [searchParams] = useSearchParams();
@@ -12,36 +13,6 @@ const MultipleChoiceQuestions: Component = () => {
     const [formatParam, setFormatParam] = createSignal(searchParams.format?.toString() || '');
     const [isEditMode, setIsEditMode] = createSignal(searchParams.edit?.toString() === 'true');
     const [editFilename, setEditFilename] = createSignal(searchParams.filename?.toString() || '');
-
-    // Mappings for display values
-    const categoryMap: { [key: string]: string } = {
-        "mixed": "Mixed Categories",
-        "art_design": "Art & Design",
-        "computer_science_tech": "Computer Science & Tech",
-        "entertainment": "Entertainment",
-        "food_drink": "Food & Drink",
-        "general_knowledge": "General Knowledge",
-        "geography": "Geography",
-        "history_politics": "History & Politics",
-        "mathematics_logic": "Mathematics & Logic",
-        "mythology_religion": "Mythology & Religion",
-        "science_nature": "Science & Nature",
-        "space_astronomy": "Space & Astronomy",
-        "sports_games": "Sports & Games",
-    }
-
-    const difficultyMap: { [key: string]: string } = {
-        "mixed": "Mixed Difficulty",
-        "very_easy": "Very Easy",
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard",
-        "very_hard": "Very Hard",
-    }
-
-    const formatMap: { [key: string]: string } = {
-        "multiple_choice_question": "Multiple Choice Question"
-    }
 
     const categoryDisplay = () => categoryMap[category() || ''] || category()
     const difficultyDisplay = () => difficultyMap[difficulty() || ''] || difficulty()
