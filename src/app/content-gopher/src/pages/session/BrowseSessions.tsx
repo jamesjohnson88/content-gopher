@@ -1,13 +1,14 @@
 ﻿import type { Component } from 'solid-js';
-import { createResource, Show, For } from 'solid-js';
+import { createResource, Show, For, createMemo } from 'solid-js';
 import { A } from '@solidjs/router';
-import { categoryMap, difficultyMap } from '../../types/mappings';
+import { categoryMap, difficultyMap, formatMap } from '../../types/mappings';
 
 // import styles from './App.module.css';
 
 interface SessionInfo {
     filename: string;
     name: string;
+    type: string;
     categories: string[];
     difficulties: string[];
     questionCount: number;
@@ -24,6 +25,25 @@ const BrowseSessions: Component = () => {
         if (!response.ok) throw new Error('Failed to fetch directory info');
         return response.json();
     });
+
+    const getQuestionPoolStats = (session: SessionInfo) => {
+        const categoryKey = session.categories.length > 1 ? 'mixed' : session.categories[0] || '';
+        const difficultyKey = session.difficulties.length > 1 ? 'mixed' : session.difficulties[0] || '';
+        const key = `questions_${session.name}_${categoryKey}_${difficultyKey}_${session.type}`;
+        const savedQuestions = localStorage.getItem(key);
+        if (savedQuestions) {
+            try {
+                const data = JSON.parse(savedQuestions) as { generated: any[], approved: any[] };
+                return {
+                    poolCount: data.generated.length,
+                    approvedCount: data.approved.length
+                };
+            } catch (e) {
+                console.error('Error parsing saved questions:', e);
+            }
+        }
+        return { poolCount: 0, approvedCount: 0 };
+    };
 
     return (
         <main class="container mx-auto py-8 px-4 flex-grow">
@@ -79,13 +99,13 @@ const BrowseSessions: Component = () => {
                             <For each={directoryInfo()!.sessions}>
                                 {(session) => (
                                     <div class="bg-white border rounded-lg shadow-sm">
-                                        <div class="p-6">
-                                            <div class="flex justify-between items-start">
-                                                <div>
+                                        <A href={`/sessions/edit/${session.filename}`} class="block h-full">
+                                            <div class="px-6 py-4 flex justify-between items-center">
+                                                <div class="flex-grow">
                                                     <h2 class="text-xl font-semibold mb-2">{session.name}</h2>
-                                                    <div class="flex flex-wrap gap-2 mb-4">
+                                                    <div class="flex flex-wrap gap-2">
                                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                            {session.questionCount} Questions
+                                                            {formatMap[session.type] || session.type}
                                                         </span>
                                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                             {session.categories.length > 1 ? categoryMap["mixed"] : categoryMap[session.categories[0]] || session.categories[0]}
@@ -95,16 +115,22 @@ const BrowseSessions: Component = () => {
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <A href={`/sessions/edit/${session.filename}`}>
-                                                    <button class="text-blue-600 hover:text-blue-800 border border-blue-300 bg-white hover:bg-blue-50 px-3 py-1.5 rounded text-sm flex items-center gap-1">
+                                                <div class="flex items-center gap-4 text-sm text-gray-600">
+                                                    <div class="flex items-center gap-1">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                                         </svg>
-                                                        Edit
-                                                    </button>
-                                                </A>
+                                                        <span>{getQuestionPoolStats(session).poolCount} in pool</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        <span>{getQuestionPoolStats(session).approvedCount} approved</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </A>
                                     </div>
                                 )}
                             </For>
