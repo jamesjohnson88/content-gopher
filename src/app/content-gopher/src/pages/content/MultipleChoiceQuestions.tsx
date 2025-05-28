@@ -1,16 +1,17 @@
-﻿import { Component, createSignal, For, Show } from "solid-js"
+﻿import { Component, createSignal, For, Show, createEffect } from "solid-js"
 import { useSearchParams } from "@solidjs/router"
 import { QuestionGenerator } from "../../components/QuestionGenerator"
 import { QuestionCard } from "../../components/QuestionCard"
 import { Question } from "../../types/question"
 
 const MultipleChoiceQuestions: Component = () => {
-    // URL params
-    const [searchParams] = useSearchParams()
-    const sessionName = () => searchParams.name || "Untitled Session"
-    const categoryParam = () => (searchParams.category as string) || "mixed"
-    const difficultyParam = () => (searchParams.difficulty as string) || "mixed"
-    const formatParam = () => searchParams.format || "multiple_choice_question"
+    const [searchParams] = useSearchParams();
+    const [sessionName, setSessionName] = createSignal(searchParams.name?.toString() || '');
+    const [category, setCategory] = createSignal(searchParams.category?.toString() || '');
+    const [difficulty, setDifficulty] = createSignal(searchParams.difficulty?.toString() || '');
+    const [formatParam, setFormatParam] = createSignal(searchParams.format?.toString() || '');
+    const [isEditMode, setIsEditMode] = createSignal(searchParams.edit?.toString() === 'true');
+    const [editFilename, setEditFilename] = createSignal(searchParams.filename?.toString() || '');
 
     // Mappings for display values
     const categoryMap: { [key: string]: string } = {
@@ -42,13 +43,13 @@ const MultipleChoiceQuestions: Component = () => {
         "multiple_choice_question": "Multiple Choice Question"
     }
 
-    const categoryDisplay = () => categoryMap[categoryParam().toString()] || categoryParam()
-    const difficultyDisplay = () => difficultyMap[difficultyParam().toString()] || difficultyParam()
-    const formatDisplay = () => formatMap[formatParam().toString()] || formatParam()
+    const categoryDisplay = () => categoryMap[category() || ''] || category()
+    const difficultyDisplay = () => difficultyMap[difficulty() || ''] || difficulty()
+    const formatDisplay = () => formatMap[formatParam() || ''] || formatParam()
 
     // State management
     const getSessionKey = () => {
-        return `questions_${sessionName()}_${categoryParam()}_${difficultyParam()}_${formatParam()}`
+        return `questions_${sessionName()}_${category()}_${difficulty()}_${formatParam()}`
     }
 
     const initialQuestions = (() => {
@@ -97,8 +98,8 @@ const MultipleChoiceQuestions: Component = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    category: categoryParam(),
-                    difficulty: difficultyParam(),
+                    category: category(),
+                    difficulty: difficulty(),
                     additionalInfo: prompt
                 })
             })
@@ -216,6 +217,32 @@ const MultipleChoiceQuestions: Component = () => {
     const generatedQuestions = () => questions().generated
     const approvedQuestions = () => questions().approved
 
+    // Load existing questions if in edit mode
+    createEffect(async () => {
+        if (isEditMode() && editFilename()) {
+            try {
+                const response = await fetch(`http://localhost:7272/api/sessions/${editFilename()}`);
+                if (!response.ok) throw new Error('Failed to fetch session data');
+                const data = await response.json();
+
+                // Add existing questions to the approved list
+                setQuestions(prev => ({
+                    ...prev,
+                    approved: data.questions.map((q: any) => ({
+                        id: crypto.randomUUID(),
+                        text: q.text,
+                        possibleAnswers: q.possibleAnswers,
+                        correctAnswer: q.correctAnswer,
+                        category: q.category,
+                        difficulty: q.difficulty,
+                    }))
+                }));
+            } catch (error) {
+                console.error('Failed to load session data:', error);
+            }
+        }
+    });
+
     const handleExport = async () => {
         try {
             setExportError(null);
@@ -252,12 +279,12 @@ const MultipleChoiceQuestions: Component = () => {
                 <div>
                     <h1 class="text-3xl font-bold">{sessionName()}</h1>
                     <div class="flex flex-wrap gap-2 mt-2">
-                        <Show when={categoryParam()}>
+                        <Show when={category()}>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                 Category: {categoryDisplay()}
                             </span>
                         </Show>
-                        <Show when={difficultyParam()}>
+                        <Show when={difficulty()}>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                 Difficulty: {difficultyDisplay()}
                             </span>
@@ -368,8 +395,8 @@ const MultipleChoiceQuestions: Component = () => {
                                         onApprove={handleApproveQuestion}
                                         onEdit={handleEditQuestion}
                                         onDiscard={handleDiscardQuestion}
-                                        sessionCategory={categoryParam()}
-                                        sessionDifficulty={difficultyParam()}
+                                        sessionCategory={category()}
+                                        sessionDifficulty={difficulty()}
                                     />
                                 )}
                             </For>
