@@ -98,7 +98,7 @@ const BrowseSessions: Component = () => {
                         {directoryInfo() && (
                             <For each={directoryInfo()!.sessions}>
                                 {(session) => (
-                                    <div class="bg-white border rounded-lg shadow-sm">
+                                    <div class="bg-white border rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1 hover:bg-gray-50">
                                         <A href={`/sessions/edit/${session.filename}`} class="block h-full">
                                             <div class="px-6 py-4 flex justify-between items-center">
                                                 <div class="flex-grow">
