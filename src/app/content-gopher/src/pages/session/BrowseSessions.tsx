@@ -27,22 +27,41 @@ const BrowseSessions: Component = () => {
     });
 
     const getQuestionPoolStats = (session: SessionInfo) => {
-        const categoryKey = session.categories.length > 1 ? 'mixed' : session.categories[0] || '';
-        const difficultyKey = session.difficulties.length > 1 ? 'mixed' : session.difficulties[0] || '';
-        const key = `questions_${session.name}_${categoryKey}_${difficultyKey}_${session.type}`;
-        const savedQuestions = localStorage.getItem(key);
-        if (savedQuestions) {
+        // Find a key that matches the session's name and type, ignoring categories and difficulties
+        console.log('Looking for matches for session:', {
+            name: session.name,
+            type: session.type
+        });
+
+        const allKeys = Object.keys(localStorage).filter(key => key.startsWith('questions_'));
+        console.log('All question keys in localStorage:', allKeys);
+
+        const matchingKey = allKeys.find(key =>
+            key.startsWith('questions_') &&
+            key.endsWith(`_${session.type}`) &&
+            key.includes(session.name)
+        );
+
+        console.log('Found matching key:', matchingKey);
+
+        let poolCount = 0;
+        let approvedCount = 0;
+
+        if (matchingKey) {
             try {
-                const data = JSON.parse(savedQuestions) as { generated: any[], approved: any[] };
-                return {
-                    poolCount: data.generated.length,
-                    approvedCount: data.approved.length
-                };
+                const data = JSON.parse(localStorage.getItem(matchingKey)!) as { generated: any[], approved: any[] };
+                poolCount = data.generated.length;
+                approvedCount = data.approved.length;
+                console.log('Found counts:', { poolCount, approvedCount });
             } catch (e) {
                 console.error('Error parsing saved questions:', e);
             }
         }
-        return { poolCount: 0, approvedCount: 0 };
+
+        return {
+            poolCount,
+            approvedCount
+        };
     };
 
     return (
