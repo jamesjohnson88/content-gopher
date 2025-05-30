@@ -46,6 +46,8 @@ const BrowseSessions: Component = () => {
 
         let poolCount = 0;
         let approvedCount = 0;
+        let categories: string[] = [];
+        let difficulties: string[] = [];
 
         if (matchingKey) {
             try {
@@ -53,6 +55,15 @@ const BrowseSessions: Component = () => {
                 poolCount = data.generated.length;
                 approvedCount = data.approved.length;
                 console.log('Found counts:', { poolCount, approvedCount });
+
+                // Extract categories and difficulties from the key
+                const keyParts = matchingKey.split('_');
+                if (keyParts.length >= 4) {
+                    const categoryPart = keyParts[2];
+                    const difficultyPart = keyParts[3];
+                    categories = categoryPart === 'mixed' ? ['mixed'] : [categoryPart];
+                    difficulties = difficultyPart === 'mixed' ? ['mixed'] : [difficultyPart];
+                }
             } catch (e) {
                 console.error('Error parsing saved questions:', e);
             }
@@ -60,7 +71,9 @@ const BrowseSessions: Component = () => {
 
         return {
             poolCount,
-            approvedCount
+            approvedCount,
+            categories: categories.length > 0 ? categories : session.categories,
+            difficulties: difficulties.length > 0 ? difficulties : session.difficulties
         };
     };
 
@@ -127,10 +140,10 @@ const BrowseSessions: Component = () => {
                                                             {formatMap[session.type] || session.type}
                                                         </span>
                                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                            {session.categories.length > 1 ? categoryMap["mixed"] : categoryMap[session.categories[0]] || session.categories[0]}
+                                                            {getQuestionPoolStats(session).categories.length > 1 ? categoryMap["mixed"] : categoryMap[getQuestionPoolStats(session).categories[0]] || getQuestionPoolStats(session).categories[0]}
                                                         </span>
                                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                            {session.difficulties.length > 1 ? difficultyMap["mixed"] : difficultyMap[session.difficulties[0]] || session.difficulties[0]}
+                                                            {getQuestionPoolStats(session).difficulties.length > 1 ? difficultyMap["mixed"] : difficultyMap[getQuestionPoolStats(session).difficulties[0]] || getQuestionPoolStats(session).difficulties[0]}
                                                         </span>
                                                     </div>
                                                 </div>
