@@ -56,11 +56,11 @@ const BrowseSessions: Component = () => {
                 approvedCount = data.approved.length;
                 console.log('Found counts:', { poolCount, approvedCount });
 
-                // Extract categories and difficulties from the key
-                const keyParts = matchingKey.split('_');
-                if (keyParts.length >= 4) {
-                    const categoryPart = keyParts[2];
-                    const difficultyPart = keyParts[3];
+                // Extract categories and difficulties from the key using ## as separator
+                const keyParts = matchingKey.split('##');
+                if (keyParts.length >= 3) {
+                    const categoryPart = keyParts[1];
+                    const difficultyPart = keyParts[2].split('_')[0]; // Split off the type part
                     categories = categoryPart === 'mixed' ? ['mixed'] : [categoryPart];
                     difficulties = difficultyPart === 'mixed' ? ['mixed'] : [difficultyPart];
                 }

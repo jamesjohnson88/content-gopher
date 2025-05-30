@@ -20,7 +20,7 @@ const MultipleChoiceQuestions: Component = () => {
 
     // State management
     const getSessionKey = () => {
-        return `questions_${sessionName()}_${category()}_${difficulty()}_${formatParam()}`
+        return `questions_${sessionName()}##${category()}##${difficulty()}_${formatParam()}`
     }
 
     const initialQuestions = (() => {
