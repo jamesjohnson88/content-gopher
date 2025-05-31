@@ -1,6 +1,6 @@
 import type { Component } from 'solid-js';
 import { createResource, Show, createEffect } from 'solid-js';
-import { useNavigate, useParams } from '@solidjs/router';
+import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 
 interface SessionData {
     questions: Array<{
@@ -14,6 +14,7 @@ interface SessionData {
 
 const EditSession: Component = () => {
     const params = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const [sessionData] = createResource<SessionData>(async () => {
@@ -32,12 +33,39 @@ const EditSession: Component = () => {
             // Convert the type to the format expected by the URL
             const format = type.replace(/_/g, '-');
 
-            // Analyze all questions to determine if we have mixed categories/difficulties
-            const uniqueCategories = new Set(data.questions.map(q => q.category));
-            const uniqueDifficulties = new Set(data.questions.map(q => q.difficulty));
+            let category: string;
+            let difficulty: string;
 
-            const category = uniqueCategories.size > 1 ? 'mixed' : data.questions[0].category;
-            const difficulty = uniqueDifficulties.size > 1 ? 'mixed' : data.questions[0].difficulty;
+            // Check if we have a key from the URL
+            const localStorageKey = searchParams.key;
+            if (localStorageKey) {
+                const storedData = localStorage.getItem(localStorageKey);
+                if (storedData) {
+                    try {
+                        const parsedData = JSON.parse(storedData) as { generated: any[], approved: any[] };
+                        const allQuestions = [...parsedData.generated, ...parsedData.approved];
+
+                        // Check if we have multiple categories/difficulties
+                        const uniqueCategories = new Set(allQuestions.map(q => q.category));
+                        const uniqueDifficulties = new Set(allQuestions.map(q => q.difficulty));
+
+                        category = uniqueCategories.size > 1 ? 'mixed' : allQuestions[0]?.category || 'mixed';
+                        difficulty = uniqueDifficulties.size > 1 ? 'mixed' : allQuestions[0]?.difficulty || 'mixed';
+                    } catch (e) {
+                        // If we can't parse the data, fall back to session data
+                        category = data.questions[0].category;
+                        difficulty = data.questions[0].difficulty;
+                    }
+                } else {
+                    // If no data in localStorage, fall back to session data
+                    category = data.questions[0].category;
+                    difficulty = data.questions[0].difficulty;
+                }
+            } else {
+                // No key provided, use session data
+                category = data.questions[0].category;
+                difficulty = data.questions[0].difficulty;
+            }
 
             // Redirect to the content generation page with the session data
             navigate(`/content/${format}?name=${name}&category=${encodeURIComponent(category)}&difficulty=${encodeURIComponent(difficulty)}&format=${encodeURIComponent(type)}&edit=true&filename=${encodeURIComponent(params.filename)}`, { replace: true });

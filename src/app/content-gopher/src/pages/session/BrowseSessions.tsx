@@ -131,7 +131,7 @@ const BrowseSessions: Component = () => {
                             <For each={directoryInfo()!.sessions}>
                                 {(session) => (
                                     <div class="bg-white border rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1 hover:bg-gray-50">
-                                        <A href={`/sessions/edit/${session.filename}`} class="block h-full">
+                                        <A href={`/sessions/edit/${session.filename}${getQuestionPoolStats(session).poolCount > 0 ? `?key=${encodeURIComponent(Object.keys(localStorage).find(key => key.startsWith('questions_') && key.endsWith(`_${session.type}`) && key.includes(session.name)) || '')}` : ''}`} class="block h-full">
                                             <div class="px-6 py-4 flex justify-between items-center">
                                                 <div class="flex-grow">
                                                     <h2 class="text-xl font-semibold mb-2">{session.name}</h2>
