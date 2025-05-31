@@ -27,22 +27,12 @@ const BrowseSessions: Component = () => {
     });
 
     const getQuestionPoolStats = (session: SessionInfo) => {
-        // Find a key that matches the session's name and type, ignoring categories and difficulties
-        console.log('Looking for matches for session:', {
-            name: session.name,
-            type: session.type
-        });
-
         const allKeys = Object.keys(localStorage).filter(key => key.startsWith('questions_'));
-        console.log('All question keys in localStorage:', allKeys);
-
         const matchingKey = allKeys.find(key =>
             key.startsWith('questions_') &&
             key.endsWith(`_${session.type}`) &&
             key.includes(session.name)
         );
-
-        console.log('Found matching key:', matchingKey);
 
         let poolCount = 0;
         let approvedCount = 0;
@@ -54,7 +44,6 @@ const BrowseSessions: Component = () => {
                 const data = JSON.parse(localStorage.getItem(matchingKey)!) as { generated: any[], approved: any[] };
                 poolCount = data.generated.length;
                 approvedCount = data.approved.length;
-                console.log('Found counts:', { poolCount, approvedCount });
 
                 // Extract categories and difficulties from the key using ## as separator
                 const keyParts = matchingKey.split('##');
@@ -73,9 +62,16 @@ const BrowseSessions: Component = () => {
             poolCount,
             approvedCount,
             categories: categories.length > 0 ? categories : session.categories,
-            difficulties: difficulties.length > 0 ? difficulties : session.difficulties
+            difficulties: difficulties.length > 0 ? difficulties : session.difficulties,
+            matchingKey
         };
     };
+
+    // Memoize the stats for each session to avoid recalculating
+    const sessionStats = createMemo(() => {
+        if (!directoryInfo()) return new Map();
+        return new Map(directoryInfo()!.sessions.map(session => [session.filename, getQuestionPoolStats(session)]));
+    });
 
     return (
         <main class="container mx-auto py-8 px-4 flex-grow">
@@ -129,42 +125,45 @@ const BrowseSessions: Component = () => {
                     <div class="grid gap-6">
                         {directoryInfo() && (
                             <For each={directoryInfo()!.sessions}>
-                                {(session) => (
-                                    <div class="bg-white border rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1 hover:bg-gray-50">
-                                        <A href={`/sessions/edit/${session.filename}${getQuestionPoolStats(session).poolCount > 0 ? `?key=${encodeURIComponent(Object.keys(localStorage).find(key => key.startsWith('questions_') && key.endsWith(`_${session.type}`) && key.includes(session.name)) || '')}` : ''}`} class="block h-full">
-                                            <div class="px-6 py-4 flex justify-between items-center">
-                                                <div class="flex-grow">
-                                                    <h2 class="text-xl font-semibold mb-2">{session.name}</h2>
-                                                    <div class="flex flex-wrap gap-2">
-                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                            {formatMap[session.type] || session.type}
-                                                        </span>
-                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                            {getQuestionPoolStats(session).categories.length > 1 ? categoryMap["mixed"] : categoryMap[getQuestionPoolStats(session).categories[0]] || getQuestionPoolStats(session).categories[0]}
-                                                        </span>
-                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                            {getQuestionPoolStats(session).difficulties.length > 1 ? difficultyMap["mixed"] : difficultyMap[getQuestionPoolStats(session).difficulties[0]] || getQuestionPoolStats(session).difficulties[0]}
-                                                        </span>
+                                {(session) => {
+                                    const stats = sessionStats().get(session.filename);
+                                    return (
+                                        <div class="bg-white border rounded-lg shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1 hover:bg-gray-50">
+                                            <A href={`/sessions/edit/${session.filename}${stats?.poolCount > 0 ? `?key=${encodeURIComponent(stats?.matchingKey || '')}` : ''}`} class="block h-full">
+                                                <div class="px-6 py-4 flex justify-between items-center">
+                                                    <div class="flex-grow">
+                                                        <h2 class="text-xl font-semibold mb-2">{session.name}</h2>
+                                                        <div class="flex flex-wrap gap-2">
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                                {formatMap[session.type] || session.type}
+                                                            </span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                {stats?.categories.length > 1 ? categoryMap["mixed"] : categoryMap[stats?.categories[0]] || stats?.categories[0]}
+                                                            </span>
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                {stats?.difficulties.length > 1 ? difficultyMap["mixed"] : difficultyMap[stats?.difficulties[0]] || stats?.difficulties[0]}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                                                        <div class="flex items-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                            </svg>
+                                                            <span>{stats?.poolCount} in pool</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            <span>{stats?.approvedCount} approved</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="flex items-center gap-4 text-sm text-gray-600">
-                                                    <div class="flex items-center gap-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                                        </svg>
-                                                        <span>{getQuestionPoolStats(session).poolCount} in pool</span>
-                                                    </div>
-                                                    <div class="flex items-center gap-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        <span>{getQuestionPoolStats(session).approvedCount} approved</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </A>
-                                    </div>
-                                )}
+                                            </A>
+                                        </div>
+                                    );
+                                }}
                             </For>
                         )}
                     </div>
