@@ -244,6 +244,28 @@ const MultipleChoiceQuestions: Component = () => {
         }
     }
 
+    const handleExportJSON = () => {
+        // Format the questions to match the expected structure
+        const formattedQuestions = questions().approved.map(q => ({
+            category: q.category,
+            correctAnswer: q.correctAnswer,
+            difficulty: q.difficulty,
+            id: q.id,
+            possibleAnswers: q.possibleAnswers,
+            text: q.text
+        }));
+
+        const blob = new Blob([JSON.stringify(formattedQuestions, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${sessionName()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     return (
         <main class="container mx-auto py-6 px-4 flex-grow">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -267,15 +289,26 @@ const MultipleChoiceQuestions: Component = () => {
                         </Show>
                     </div>
                 </div>
-                <button
-                    class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center gap-2"
-                    onClick={handleExport}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    Export Session
-                </button>
+                <div class="flex gap-2">
+                    <button
+                        class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center gap-2"
+                        onClick={handleExport}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                        Save Session
+                    </button>
+                    <button
+                        class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded flex items-center gap-2"
+                        onClick={handleExportJSON}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export JSON
+                    </button>
+                </div>
             </div>
 
             <Show when={exportSuccess()}>
