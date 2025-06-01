@@ -1,6 +1,7 @@
 import type { Component } from 'solid-js';
 import { createResource, Show, createEffect } from 'solid-js';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
+import { parseSessionKey } from '../../utils/sessionKeys';
 
 interface SessionData {
     questions: Array<{

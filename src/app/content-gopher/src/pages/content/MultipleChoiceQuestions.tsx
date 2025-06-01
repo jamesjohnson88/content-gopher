@@ -4,6 +4,7 @@ import { QuestionGenerator } from "../../components/QuestionGenerator"
 import { QuestionCard } from "../../components/QuestionCard"
 import { Question } from "../../types/question"
 import { categoryMap, difficultyMap, formatMap } from "../../types/mappings"
+import { generateSessionKey } from "../../utils/sessionKeys"
 
 const MultipleChoiceQuestions: Component = () => {
     const [searchParams] = useSearchParams();
@@ -20,7 +21,12 @@ const MultipleChoiceQuestions: Component = () => {
 
     // State management
     const getSessionKey = () => {
-        return `questions_${sessionName()}##${category()}##${difficulty()}_${formatParam()}`
+        return generateSessionKey({
+            sessionName: sessionName(),
+            category: category(),
+            difficulty: difficulty(),
+            format: formatParam()
+        });
     }
 
     const initialQuestions = (() => {

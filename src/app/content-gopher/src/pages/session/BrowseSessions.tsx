@@ -2,6 +2,7 @@
 import { createResource, Show, For, createMemo } from 'solid-js';
 import { A } from '@solidjs/router';
 import { categoryMap, difficultyMap, formatMap } from '../../types/mappings';
+import { findMatchingSessionKey, parseSessionKey } from '../../utils/sessionKeys';
 
 // import styles from './App.module.css';
 
@@ -27,12 +28,7 @@ const BrowseSessions: Component = () => {
     });
 
     const getQuestionPoolStats = (session: SessionInfo) => {
-        const allKeys = Object.keys(localStorage).filter(key => key.startsWith('questions_'));
-        const matchingKey = allKeys.find(key =>
-            key.startsWith('questions_') &&
-            key.endsWith(`_${session.type}`) &&
-            key.includes(session.name)
-        );
+        const matchingKey = findMatchingSessionKey(session.name, session.type);
 
         let poolCount = 0;
         let approvedCount = 0;
@@ -45,13 +41,10 @@ const BrowseSessions: Component = () => {
                 poolCount = data.generated.length;
                 approvedCount = data.approved.length;
 
-                // Extract categories and difficulties from the key using ## as separator
-                const keyParts = matchingKey.split('##');
-                if (keyParts.length >= 3) {
-                    const categoryPart = keyParts[1];
-                    const difficultyPart = keyParts[2].split('_')[0]; // Split off the type part
-                    categories = categoryPart === 'mixed' ? ['mixed'] : [categoryPart];
-                    difficulties = difficultyPart === 'mixed' ? ['mixed'] : [difficultyPart];
+                const keyParts = parseSessionKey(matchingKey);
+                if (keyParts) {
+                    categories = keyParts.category === 'mixed' ? ['mixed'] : [keyParts.category];
+                    difficulties = keyParts.difficulty === 'mixed' ? ['mixed'] : [keyParts.difficulty];
                 }
             } catch (e) {
                 console.error('Error parsing saved questions:', e);
