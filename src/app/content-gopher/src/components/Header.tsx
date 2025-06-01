@@ -9,8 +9,8 @@ const Header: Component = () => {
                 <div class="flex items-center">
                     <A href="/">
                         <div class="flex items-center gap-3">
-                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                <img src={logo} alt="Content Gopher Logo" class="h-full w-full object-cover object-position-top" />
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm overflow-hidden">
+                                <img src={logo} alt="Content Gopher Logo" class="h-[200%] w-full object-cover object-[53%_60%] mt-[50px]" />
                             </div>
                             <div class="text-white">
                                 <h1 class="text-2xl font-bold">Content Gopher</h1>
