@@ -306,7 +306,7 @@ const MultipleChoiceQuestions: Component = () => {
                         Save Session
                     </button>
                     <button
-                        class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded flex items-center gap-2"
+                        class="text-gray-700 hover:text-gray-900 border border-gray-300 bg-white hover:bg-gray-50 py-2 px-4 rounded flex items-center gap-2"
                         onClick={handleExportJSON}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
