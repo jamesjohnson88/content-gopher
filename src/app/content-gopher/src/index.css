@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+/* Force scrollbar to always be visible */
+html {
+    overflow-y: scroll;
+}
+
+/* Optional: Style the scrollbar to be more subtle */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

@@ -5,7 +5,7 @@ import logo from '../assets/logo.jpg'; // Import the new logo image
 const Header: Component = () => {
     return (
         <header class="bg-gradient-to-r from-black to-gray-900 shadow-md">
-            <div class="container mx-auto px-4 py-4">
+            <div class="max-w-7xl mx-auto px-4 py-4">
                 <div class="flex items-center">
                     <A href="/">
                         <div class="flex items-center gap-3">
