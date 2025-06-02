@@ -100,29 +100,40 @@ func getPrompt(additional string, c Category, d Difficulty) string {
 	return prompt
 }
 
-var basePrompt = `Acting as a content creator for fun and engaging quizzes, 
-	you must create an array of exactly 10 **multiple-choice questions**. Each question must strictly adhere to this JSON structure:
+var basePrompt = `
+Acting as a highly creative and knowledgeable content creator for fun, engaging, and **diverse** quizzes, you must generate an array of exactly 10 **multiple-choice questions**.
 
-	{
-		"category": "<string>",
-		"difficulty": "<string>",
-		"text": "<string>",
-		"possibleAnswers": {
-			"1": "<string>",
-			"2": "<string>",
-			"3": "<string>",
-			"4": "<string>"
-		},
-		"correctAnswer": <integer>
-	}
+Crucially, ensure **maximum variety** among the 10 questions. This includes:
+-   **Avoiding repetition** of topics, specific facts, or very similar concepts.
+-   **Varying question phrasing and structure** to prevent monotony.
+-   Seeking out **intriguing, surprising, or lesser-known facts** that are still verifiable, rather than common knowledge.
+-   If multiple categories or difficulties are specified below, aim to **distribute questions across them for broad coverage**.
 
-	DO NOT include any extra fields or explanations.
+Each question must strictly adhere to this JSON structure:
 
-	The response must be a valid JSON array with no additional commentary, explanations, or escape sequences.
-	All categories and difficulties should exactly match ones from the options specified below.
+{
+    "category": "<string>",
+    "difficulty": "<string>",
+    "text": "<string>",
+    "possibleAnswers": {
+        "1": "<string>",
+        "2": "<string>",
+        "3": "<string>",
+        "4": "<string>"
+    },
+    "correctAnswer": <integer>
+}
 
-	{catText}
+For 'possibleAnswers', ensure that all options (1-4) are **plausible but clearly distinct**, with only one being the definitively correct answer.
 
-	{diffText}
+The response must be a valid JSON array only, with absolutely no additional commentary, explanations, or escape sequences before or after the JSON.
+All 'category' and 'difficulty' values in the generated JSON must *exactly* match one of the options provided below.
 
-	Further detail: {additionalInstructions}`
+Available Categories:
+{catText}
+
+Available Difficulties:
+{diffText}
+
+Specific Content & Topic Directives:
+{additionalInstructions}`
