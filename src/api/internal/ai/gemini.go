@@ -3,7 +3,7 @@ package ai
 import "github.com/google/generative-ai-go/genai"
 
 func ConfigureForFactualJsonContent(gm *genai.GenerativeModel) *genai.GenerativeModel {
-	gm.SetTemperature(1.3)
+	gm.SetTemperature(1.5)
 	gm.SetTopK(100)
 	gm.SetTopP(0.95)
 	gm.SetMaxOutputTokens(8192)
