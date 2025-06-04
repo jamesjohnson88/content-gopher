@@ -21,6 +21,8 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
     const [editedAnswer, setEditedAnswer] = createSignal(question.correctAnswer)
     const [editedCategory, setEditedCategory] = createSignal(question.category)
     const [editedDifficulty, setEditedDifficulty] = createSignal(question.difficulty)
+    const [validationResult, setValidationResult] = createSignal<{ isValid: boolean; message: string; shouldDiscard: boolean } | null>(null)
+    const [isValidating, setIsValidating] = createSignal(false)
 
     const formatDisplay = () => formatMap[sessionFormat || ''] || sessionFormat
 
@@ -53,6 +55,44 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
 
     const isMixedCategory = () => sessionCategory === "mixed"
     const isMixedDifficulty = () => sessionDifficulty === "mixed"
+
+    const handleValidate = async () => {
+        setIsValidating(true)
+        try {
+            // Convert array to map
+            const possibleAnswersMap: { [key: number]: string } = {}
+            question.possibleAnswers.forEach((answer, index) => {
+                possibleAnswersMap[index + 1] = answer
+            })
+
+            const response = await fetch('http://localhost:7272/api/content/multiple-choice-question/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: question.text,
+                    possibleAnswers: possibleAnswersMap,
+                    correctAnswer: question.correctAnswer,
+                }),
+            })
+
+            if (!response.ok) {
+                throw new Error('Validation failed')
+            }
+
+            const result = await response.json()
+            setValidationResult(result)
+        } catch (error) {
+            console.error('Error validating answer:', error)
+        } finally {
+            setIsValidating(false)
+        }
+    }
+
+    const dismissValidation = () => {
+        setValidationResult(null)
+    }
 
     return (
         <div class="border rounded-lg shadow-sm">
@@ -174,6 +214,24 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                         </div>
                     </Show>
                 </div>
+
+                <Show when={validationResult()}>
+                    <div class={`mt-4 p-4 rounded-md ${validationResult()?.isValid ? 'bg-green-50' : 'bg-red-50'}`}>
+                        <div class="flex justify-between items-start">
+                            <p class={`text-sm ${validationResult()?.isValid ? 'text-green-800' : 'text-red-800'}`}>
+                                {validationResult()?.message}
+                            </p>
+                            <button
+                                onClick={dismissValidation}
+                                class="text-gray-400 hover:text-gray-500"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </Show>
             </div>
             <div class="px-6 py-3 bg-gray-50 rounded-b-lg flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -200,6 +258,23 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                                         />
                                     </svg>
                                     Edit
+                                </button>
+                                <button
+                                    class="text-gray-700 hover:text-gray-900 border border-gray-300 bg-white hover:bg-gray-50 px-3 py-1.5 rounded text-sm flex items-center gap-1"
+                                    onClick={handleValidate}
+                                    disabled={isValidating()}
+                                >
+                                    <Show when={isValidating()} fallback={
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    }>
+                                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </Show>
+                                    Validate Answer
                                 </button>
                             </>
                         }

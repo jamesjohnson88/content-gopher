@@ -51,7 +51,7 @@ func GetSessionConfigOptions() []s.SessionOption {
 }
 
 func HandleContentGeneration(ctx context.Context, additional string, c Category, d Difficulty, gemini *genai.GenerativeModel) ([]MultipleChoiceQuestion, error) {
-	model := ai.ConfigureForFactualJsonContent(gemini)
+	model := ai.ConfigureForCreativeQuizContent(gemini)
 	prompt := getPrompt(additional, c, d)
 
 	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)

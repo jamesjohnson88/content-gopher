@@ -52,4 +52,5 @@ func addRoutes(mux *http.ServeMux, cfg *config.Config, geminiClient *genai.Clien
 
 	// multiple choice question session
 	mux.Handle("POST /api/content/multiple-choice-question/fetch", mcq.NewMultipleChoiceContentHandler(cfg, geminiClient))
+	mux.Handle("POST /api/content/multiple-choice-question/validate", mcq.ValidateAnswerHandler(cfg, geminiClient))
 }
