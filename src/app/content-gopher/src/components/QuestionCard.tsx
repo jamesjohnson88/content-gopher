@@ -3,6 +3,7 @@
 import { createSignal, Show, For } from "solid-js"
 import type { Question } from "../types/question"
 import { categoryMap, difficultyMap, formatMap } from "../types/mappings"
+import { getApiUrl } from '../config'
 
 interface QuestionCardProps {
     question: Question
@@ -65,7 +66,7 @@ export function QuestionCard({ question, onApprove, onEdit, onDiscard, sessionCa
                 possibleAnswersMap[index + 1] = answer
             })
 
-            const response = await fetch('http://localhost:7272/api/content/multiple-choice-question/validate', {
+            const response = await fetch(getApiUrl('content/multiple-choice-question/validate'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -2,7 +2,7 @@
 
 import { createSignal, createResource, createMemo, createEffect } from "solid-js"
 import { useNavigate } from "@solidjs/router";
-
+import { getApiUrl } from '../../config';
 
 import type { Component } from 'solid-js';
 
@@ -44,8 +44,7 @@ const NewSession: Component = () => {
     const navigate = useNavigate();
 
     async function fetchData(): Promise<SessionOptions> {
-        // todo - construct url from config
-        const response = await fetch("http://localhost:7272/api/sessions/options");
+        const response = await fetch(getApiUrl('sessions/options'));
         if (!response.ok) throw new Error("Could not fetch data");
         return response.json();
     }
@@ -96,7 +95,7 @@ const NewSession: Component = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:7272/api/sessions", {
+            const response = await fetch(getApiUrl('sessions'), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

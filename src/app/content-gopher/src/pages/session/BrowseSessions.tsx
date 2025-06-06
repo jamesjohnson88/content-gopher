@@ -3,6 +3,7 @@ import { createResource, Show, For, createMemo } from 'solid-js';
 import { A } from '@solidjs/router';
 import { categoryMap, difficultyMap, formatMap } from '../../types/mappings';
 import { findMatchingSessionKey, parseSessionKey } from '../../utils/sessionKeys';
+import { getApiUrl } from '../../config';
 
 // import styles from './App.module.css';
 
@@ -22,7 +23,7 @@ interface DirectoryInfo {
 
 const BrowseSessions: Component = () => {
     const [directoryInfo] = createResource<DirectoryInfo>(async () => {
-        const response = await fetch('http://localhost:7272/api/sessions/directory');
+        const response = await fetch(getApiUrl('sessions/directory'));
         if (!response.ok) throw new Error('Failed to fetch directory info');
         return response.json();
     });

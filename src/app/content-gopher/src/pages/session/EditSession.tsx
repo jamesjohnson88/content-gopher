@@ -2,6 +2,7 @@ import type { Component } from 'solid-js';
 import { createResource, Show, createEffect } from 'solid-js';
 import { useNavigate, useParams, useSearchParams } from '@solidjs/router';
 import { parseSessionKey } from '../../utils/sessionKeys';
+import { getApiUrl } from '../../config';
 
 interface SessionData {
     questions: Array<{
@@ -19,7 +20,7 @@ const EditSession: Component = () => {
     const navigate = useNavigate();
 
     const [sessionData] = createResource<SessionData>(async () => {
-        const response = await fetch(`http://localhost:7272/api/sessions/${params.filename}`);
+        const response = await fetch(getApiUrl(`sessions/${params.filename}`));
         if (!response.ok) throw new Error('Failed to fetch session data');
         return response.json();
     });

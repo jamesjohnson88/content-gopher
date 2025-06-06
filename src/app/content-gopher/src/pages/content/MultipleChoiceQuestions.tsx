@@ -5,6 +5,7 @@ import { QuestionCard } from "../../components/QuestionCard"
 import { Question } from "../../types/question"
 import { categoryMap, difficultyMap, formatMap } from "../../types/mappings"
 import { generateSessionKey } from "../../utils/sessionKeys"
+import { getApiUrl } from '../../config'
 
 const MultipleChoiceQuestions: Component = () => {
     const [searchParams] = useSearchParams();
@@ -69,7 +70,7 @@ const MultipleChoiceQuestions: Component = () => {
 
         setIsGenerating(true)
         try {
-            const response = await fetch('http://localhost:7272/api/content/multiple-choice-question/fetch', {
+            const response = await fetch(getApiUrl('content/multiple-choice-question/fetch'), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -198,7 +199,7 @@ const MultipleChoiceQuestions: Component = () => {
     createEffect(async () => {
         if (isEditMode() && editFilename()) {
             try {
-                const response = await fetch(`http://localhost:7272/api/sessions/${editFilename()}`);
+                const response = await fetch(getApiUrl(`sessions/${editFilename()}`));
                 if (!response.ok) throw new Error('Failed to fetch session data');
                 const data = await response.json();
 
@@ -223,7 +224,7 @@ const MultipleChoiceQuestions: Component = () => {
     const handleExport = async () => {
         try {
             setExportError(null);
-            const response = await fetch("http://localhost:7272/api/sessions/export", {
+            const response = await fetch(getApiUrl('sessions/export'), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
