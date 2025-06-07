@@ -18,7 +18,8 @@ prod:
 # Stop all services
 down:
     @echo "Stopping all services..."
-    @docker compose down
+    @docker compose -p content-gopher-dev down
+    @docker compose -p content-gopher-prod down
 
 # Clean Docker cache and unused resources
 clean:
@@ -33,6 +34,7 @@ clean-all:
 # Nuke Docker (complete cleanup)
 nuke: 
     @echo "Performing complete Docker cleanup..."
-    @docker compose down -v --rmi all
+    @docker compose -p content-gopher-dev down -v --rmi all
+    @docker compose -p content-gopher-prod down -v --rmi all
     @docker builder prune -f
     @docker system prune -f --volumes --all
