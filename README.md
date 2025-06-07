@@ -31,41 +31,62 @@ Content Gopher is a service that processes and manages content using the Gemini 
 
 ## Running the Service
 
-### Backend (API)
+### Development Environment
 
-#### Using Docker Compose
+The development environment runs the API service only, with the frontend running locally for development.
+
+#### Using Just Commands (Recommended)
 
 ```bash
-docker compose up -d api
+just dev
 ```
 
-#### Using Just Commands
+This will:
+- Start the API service on port 7272
+- Mount the development output directory at `~/Desktop/gopher-output-dev`
+- Run the service with the development configuration
 
-If you have Just installed, you can use the following commands:
+### Production Environment
 
-- Start the API:
-  ```bash
-  just api-up
-  ```
+The production environment runs both the API and frontend services in Docker containers.
 
-- Start the API with COMPOSE_BAKE enabled:
-  ```bash
-  just api-bake
-  ```
+#### Using Just Commands (Recommended)
 
-- Stop the API:
-  ```bash
-  just api-down
-  ```
+```bash
+just prod
+```
 
-- Clean up Docker resources:
-  ```bash
-  just nuke
-  ```
+This will:
+- Start the API service on port 7070
+- Start the frontend service on port 3000
+- Mount the production output directory at `~/Desktop/gopher-output-prod`
+- Run the services with the production configuration
 
-### Frontend
+### Running Both Environments
 
-The frontend is built with SolidJS and uses Vite as the build tool. To run the frontend:
+You can run both development and production environments simultaneously:
+
+```bash
+just dev   # Starts development environment
+just prod  # Starts production environment
+```
+
+Each environment will:
+- Use its own isolated Docker network
+- Have its own output directory
+- Run on different ports
+- Not interfere with each other
+
+### Stopping Services
+
+To stop all services:
+```bash
+just down
+```
+
+### Frontend Development
+
+For frontend development, you can run the frontend locally:
 
 1. Navigate to the frontend directory:
    ```bash
@@ -115,11 +136,17 @@ The service is configured through environment variables:
 
 ## Output Directory
 
-The service mounts a volume at `~/Desktop/gopher-output` to store processed content. Make sure this directory exists on your system.
+The service uses different output directories for development and production:
+- Development: `~/Desktop/gopher-output-dev`
+- Production: `~/Desktop/gopher-output-prod`
 
-## API
+Make sure these directories exist on your system.
 
-The API is accessible at `http://localhost:7272` when running locally.
+## API Endpoints
+
+- Development API: `http://localhost:7272`
+- Production API: `http://localhost:7070`
+- Production Frontend: `http://localhost:3000`
 
 ## Development
 

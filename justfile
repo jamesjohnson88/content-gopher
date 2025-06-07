@@ -1,36 +1,38 @@
-# Set PowerShell as the shell with COMPOSE_BAKE enabled
-set shell := ["powershell", "-Command", "$env:COMPOSE_BAKE='false';"]
+# Set PowerShell as the shell with COMPOSE_BAKE and DOCKER_BUILDKIT enabled
+set shell := ["powershell", "-Command", "$env:COMPOSE_BAKE='false'; $env:DOCKER_BUILDKIT='1';"]
 
 # Default Defaults to listing options when no args are provided
 default:
     @just --list
 
-# Start the API using Docker Compose
-api-up:
-    @echo "Starting API container..."
-    @docker compose up -d api
+# Start API service in development mode (frontend should be run locally)
+dev:
+    @echo "Starting API service in development mode..."
+    @docker compose -f docker-compose.yml -f docker-compose.dev.yml -p content-gopher-dev up -d
 
-# Start the API using Docker Compose and COMPOSE_BAKE=true
-api-bake:
-    @echo "Starting API container..."
-    @$env:COMPOSE_BAKE='true'; docker compose up -d api
+# Start all services in production mode
+prod:
+    @echo "Starting all services in production mode..."
+    @docker compose -f docker-compose.yml -f docker-compose.prod.yml -p content-gopher-prod --profile prod up -d
 
-# Stop the API container
-api-down:
-    @echo "Stopping API container..."
-    @docker compose down api -v
+# Stop all services
+down:
+    @echo "Stopping all services..."
+    @docker compose down
 
-# Nuke Docker
+# Clean Docker cache and unused resources
+clean:
+    @echo "Cleaning Docker cache and unused resources..."
+    @docker system prune -f
+
+# Clean Docker cache, unused resources, and volumes
+clean-all:
+    @echo "Cleaning Docker cache, unused resources, and volumes..."
+    @docker system prune -f --volumes
+
+# Nuke Docker (complete cleanup)
 nuke: 
-    docker-compose down -v --rmi all
-    docker builder prune -f
-
-# Hidden alias' (won't show in --list)
-[private]
-up: api-up
-
-[private]
-bake: api-bake
-
-[private]
-down: api-down
+    @echo "Performing complete Docker cleanup..."
+    @docker compose down -v --rmi all
+    @docker builder prune -f
+    @docker system prune -f --volumes --all

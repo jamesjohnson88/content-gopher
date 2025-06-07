@@ -1,19 +1,35 @@
 services:
   api:
     build:
-      context: .\src\api
+      context: ./src/api
       dockerfile: Dockerfile
+    # ports: set in env specific files
     env_file:
-      - .\src\api\.env
-    ports:
-      - "7272:7272"
+      - ./src/api/.env
     environment:
       - SERVICE_NAME=content-gopher
       - ENVIRONMENT=development
       - HOST=0.0.0.0
       - PORT=7272
       - DEFAULT_OUTPUT_DIRECTORY=/gopher-output
-      - GEMINI_MODEL=gemini-2.5-flash-preview-05-20 # GEMINI_API_KEY will be loaded from .env file
+      - GEMINI_MODEL=gemini-2.5-flash-preview-05-20
+      #- GEMINI_API_KEY=${GEMINI_API_KEY} # Either set here or as .env in the src/api directory
     volumes:
-      - ~/Desktop/gopher-output:/gopher-output
-    restart: unless-stopped 
+      - type: bind
+        source: C:/Users/James/Desktop/gopher-output-default
+        target: /gopher-output
+        consistency: delegated
+    restart: unless-stopped
+
+  frontend:
+    profiles:
+      - prod
+    build:
+      context: ./src/app/content-gopher
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:7070
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api 

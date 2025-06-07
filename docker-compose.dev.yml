@@ -1,0 +1,14 @@
+services:
+  api:
+    environment:
+      - ENVIRONMENT=development
+      - HOST=0.0.0.0
+      - PORT=7272
+      - DEFAULT_OUTPUT_DIRECTORY=/gopher-output
+    ports:
+      - "7272:7272"
+    volumes:
+      - type: bind
+        source: C:/Users/James/Desktop/gopher-output-dev
+        target: /gopher-output
+        consistency: delegated 

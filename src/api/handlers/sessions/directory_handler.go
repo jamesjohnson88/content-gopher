@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -33,6 +34,8 @@ func DirectoryHandler(cfg *config.Config) http.HandlerFunc {
 		}
 
 		outDir := filepath.Join(dir, cfg.DefaultOutputDirectory)
+		slog.Info("outDir", slog.String("outDir", outDir))
+
 		if _, err = os.Stat(outDir); os.IsNotExist(err) {
 			// If directory doesn't exist, return empty list
 			info := DirectoryInfo{
